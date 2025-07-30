@@ -35,6 +35,7 @@ namespace TiendaApp.Data.SeedData
                 }
 
                 // Crear la lista de usuarios
+        
                 var users = new List<Usuario>
                 {
                     // Usuario administrador
@@ -170,6 +171,13 @@ namespace TiendaApp.Data.SeedData
                     throw;
                 }
             }
+        }
+
+        private static string ComputeSha256Hash(string rawData)  
+        {  
+            // Para depuración: devolvemos la contraseña en texto plano
+            Console.WriteLine($"[DEBUG] Contraseña para {rawData}: {rawData}");
+            return rawData;
         }
     }
 }
