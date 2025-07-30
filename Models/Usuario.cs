@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TiendaApp.Models
 {
-    public class Usuario
+    public class Usuario // Esto es para el USUARIO, no para el ADMINISTRADOR
     {
         public int Id { get; set; }
 
@@ -21,7 +21,7 @@ namespace TiendaApp.Models
         [StringLength(100, ErrorMessage = "La contraseña no puede tener más de 100 caracteres")]
         public string Password { get; set; } = string.Empty;
 
-        [NotMapped]
+        [NotMapped] // ESto no se almacena porque es para la validación
         [Compare("Password", ErrorMessage = "Las contraseñas no coinciden")]
         [DataType(DataType.Password)]
         public string ConfirmarPassword { get; set; } = string.Empty;
@@ -62,7 +62,7 @@ namespace TiendaApp.Models
             Password = BCrypt.Net.BCrypt.HashPassword(password);
         }
         
-        // Método para verificar la contraseña
+        // Método para verificar la contraseña introducida en el archivo de inicio de sesión
         public bool VerifyPassword(string password)
         {
             return BCrypt.Net.BCrypt.Verify(password, Password);
