@@ -23,7 +23,7 @@ namespace TiendaApp.Controllers
         {
             var query = _context.Productos.AsQueryable();
             
-            if (!string.IsNullOrWhiteSpace(tipo))
+            if (!string.IsNullOrWhiteSpace(tipo)) // No permite que sea null o que el campo esté vacío
             {
                 var tipoDecoded = Uri.UnescapeDataString(tipo);
                 if (!string.IsNullOrWhiteSpace(tipoDecoded))

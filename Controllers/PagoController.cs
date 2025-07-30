@@ -25,7 +25,7 @@ namespace TiendaApp.Controllers
         }
 
         // GET: Pago/MetodoPago
-        [Authorize]
+        [Authorize] // Debe estar logado
         public IActionResult MetodoPago()
         {
             _logger.LogInformation("=== INICIO MetodoPago ===");
@@ -76,7 +76,7 @@ namespace TiendaApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View("MetodoPago", model);
+                return View("MetodoPago", model); // Si el modelo no es válido, volver a mostrar el formulario
             }
 
             // Obtener el ID del usuario actual

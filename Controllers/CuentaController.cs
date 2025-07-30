@@ -10,7 +10,7 @@ using TiendaApp.Models;
 
 namespace TiendaApp.Controllers
 {
-    public class CuentaController : Controller
+    public class CuentaController : Controller // Este controlador maneja las acciones relacionadas con la cuenta de usuario, como iniciar sesión, registrarse y cambiar contraseña
     {
         private readonly TiendaContext _context;
         private readonly ILogger<CuentaController> _logger;
@@ -29,7 +29,7 @@ namespace TiendaApp.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
+        [AllowAnonymous] // Permite el acceso a todos, incluso a los no autenticados
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> IniciarSesion(LoginViewModel model, string? returnUrl = null)
         {

@@ -9,7 +9,7 @@ using TiendaApp.Models.ViewModels;
 
 namespace TiendaApp.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador")] // El ADMINISTRADOR ve la lista de usuarios completa
     public class UsuariosController : Controller
     {
         private readonly TiendaContext _context;
@@ -21,7 +21,7 @@ namespace TiendaApp.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index() // El ADMINISTRADOR ve la lista de usuarios
         {
             var usuarios = await _context.Usuarios
                 .Include(u => u.Rol)
@@ -43,12 +43,12 @@ namespace TiendaApp.Controllers
                     UltimoAcceso = u.UltimoAcceso,
                     Rol = u.Rol != null ? u.Rol.Nombre : "Sin rol asignado"
                 })
-                .ToListAsync();
+                .ToListAsync(); // Obtener la lista de usuarios con sus roles
 
             return View(usuarios);
         }
 
-        public async Task<IActionResult> Detalles(int? id)
+        public async Task<IActionResult> Detalles(int? id) // El ADMINISTRADOR ve los detalles de un usuario específico
         {
             if (id == null)
             {
@@ -78,7 +78,7 @@ namespace TiendaApp.Controllers
                 EstaActivo = usuario.EstaActivo,
                 FechaRegistro = usuario.FechaRegistro,
                 UltimoAcceso = usuario.UltimoAcceso,
-                Rol = usuario.Rol?.Nombre ?? "Sin rol asignado"
+                Rol = usuario.Rol?.Nombre ?? "Sin rol asignado" // Cuando se crea un nuevo usuario, el ADMINISTRADOR tiene que asignarle un rol en su perfil
             };
 
             return View(viewModel);
@@ -225,7 +225,7 @@ namespace TiendaApp.Controllers
             return View(usuario);
         }
 
-        public async Task<IActionResult> Eliminar(int? id)
+        public async Task<IActionResult> Eliminar(int? id) // Esto elimina el usuario seleccionado en el menú de usuarios del ADMINISTRADOR
         {
             if (id == null)
             {
@@ -261,16 +261,16 @@ namespace TiendaApp.Controllers
             return View(viewModel);
         }
 
-        [HttpPost, ActionName("Eliminar")]
+        [HttpPost, ActionName("Eliminar")] // Eliminación confirmada del usuario
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EliminarConfirmado(int id)
+        public async Task<IActionResult> EliminarConfirmado(int id) // Muestra la acción, y procede a dejar un mensaje de eliminación confirmada
         {
             var usuario = await _context.Usuarios.FindAsync(id);
             if (usuario != null)
             {
                 _context.Usuarios.Remove(usuario);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Usuario eliminado correctamente.";
+                TempData["SuccessMessage"] = "Usuario eliminado correctamente."; // Mensaje de eliminación confirmada del usuario seleccionado
             }
             return RedirectToAction(nameof(Index));
         }
@@ -281,4 +281,3 @@ namespace TiendaApp.Controllers
         }
     }
 }
-

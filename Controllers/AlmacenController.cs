@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace TiendaApp.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador")] // El ADMINISTRADOR es el único con acceso al almacén
     public class AlmacenController : Controller
     {
         private readonly TiendaContext _context;
@@ -25,19 +25,19 @@ namespace TiendaApp.Controllers
             ViewData["Filtro"] = filtro ?? string.Empty;
             ViewData["OrdenActual"] = orden ?? "nombre";
             ViewData["DireccionActual"] = direccion ?? "asc";
-            ViewData["DireccionNombre"] = orden == "nombre" && direccion == "asc" ? "desc" : "asc";
+            ViewData["DireccionNombre"] = orden == "nombre" && direccion == "asc" ? "desc" : "asc"; // Cambia la dirección de ordenación al hacer clic en el encabezado de nombre
             ViewData["DireccionStock"] = orden == "stock" && direccion == "asc" ? "desc" : "asc";
             ViewData["DireccionPrecio"] = orden == "precio" && direccion == "asc" ? "desc" : "asc";
 
             var query = _context.Productos.AsQueryable();
 
-            if (!string.IsNullOrEmpty(filtro))
+            if (!string.IsNullOrEmpty(filtro)) // Filtrar productos por nombre, descripción o tipo
             {
                 var filtroLower = filtro.ToLowerInvariant();
                 query = query.Where(p => 
                     (p.Nombre != null && p.Nombre.ToLowerInvariant().Contains(filtroLower)) || 
                     (p.Descripcion != null && p.Descripcion.ToLowerInvariant().Contains(filtroLower)) ||
-                    (p.Tipo != null && p.Tipo.ToLowerInvariant().Contains(filtroLower)));
+                    (p.Tipo != null && p.Tipo.ToLowerInvariant().Contains(filtroLower))); // Filtrar por nombre, descripción o tipo, en este caso, por TIPO
             }
 
             // Aplicar ordenación
@@ -65,24 +65,24 @@ namespace TiendaApp.Controllers
 
             // Obtener productos con stock bajo
             ViewBag.ProductosStockBajo = await _context.Productos
-                .Where(p => p.Stock < 10 && p.Activo)
-                .OrderBy(p => p.Stock)
-                .Take(10)
-                .ToListAsync();
+                .Where(p => p.Stock < 10 && p.Activo) // Filtrar productos con stock bajo y activos
+                .OrderBy(p => p.Stock) // Ordenar por stock
+                .Take(10) // Limitar a los 10 productos con menor stock
+                .ToListAsync(); // Obtener los productos con stock bajo
 
             return View(await query.AsNoTracking().ToListAsync());
         }
 
-        public async Task<IActionResult> Detalles(int? id)
+        public async Task<IActionResult> Detalles(int? id) // Método para mostrar los detalles de un producto
         {
-            if (id == null)
+            if (id == null) // Verificar si el ID es NULL
             {
                 return NotFound();
             }
 
-            var producto = await _context.Productos
-                .FirstOrDefaultAsync(m => m.Id == id);
-                
+            var producto = await _context.Productos // Buscar el producto por ID
+                .FirstOrDefaultAsync(m => m.Id == id); // Usar FirstOrDefaultAsync para obtener el primer producto que coincida con el ID
+
             if (producto == null)
             {
                 return NotFound();
@@ -221,8 +221,8 @@ namespace TiendaApp.Controllers
                         await _context.SaveChangesAsync();
                     }
 
-                    TempData["SuccessMessage"] = "Producto creado correctamente.";
-                    return RedirectToAction(nameof(Index));
+                    TempData["SuccessMessage"] = "Producto creado correctamente."; // Mensaje de éxito al crear el producto
+                    return RedirectToAction(nameof(Index)); // Redirigir a la lista de productos
                 }
                 catch (Exception ex)
                 {

@@ -7,7 +7,7 @@ using TiendaApp.Models;
 
 namespace TiendaApp.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : Controller // Este controlador maneja las acciones relacionadas con la página de inicio y el panel de control de la tienda
     {
         private readonly ILogger<HomeController> _logger;
         private readonly TiendaContext _context;
@@ -29,10 +29,10 @@ namespace TiendaApp.Controllers
             return View(productosDestacados);
         }
 
-        [Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")] // Autorización solo a ADMINISTRADORES al panel de control
         public IActionResult PanelControl()
         {
-            var modelo = new PanelControlViewModel
+            var modelo = new PanelControlViewModel // En el panel de administración, muestra los productos en tabla
             {
                 TotalProductos = _context.Productos.Count(),
                 TotalUsuarios = _context.Usuarios.Count(),
@@ -67,7 +67,7 @@ namespace TiendaApp.Controllers
                 StatusCode = statusCode
             };
 
-            switch (statusCode)
+            switch (statusCode) // Mensajes de error en caso de faltar datos o errores del servidor
             {
                 case 404:
                     ViewBag.ErrorMessage = "La página solicitada no existe.";

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace TiendaApp.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador")] // Solo el administrador está autorizado a acceder a la lista de ventas
     public class VentasController : Controller
     {
         private readonly TiendaContext _context;
@@ -44,7 +44,7 @@ namespace TiendaApp.Controllers
             }
         }
 
-        // GET: Ventas/Details/5
+        // GET: Ventas/Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -68,11 +68,11 @@ namespace TiendaApp.Controllers
 
         public async Task<IActionResult> Reporte()
         {
-            var fechaInicio = DateTime.Today.AddMonths(-1);
+            var fechaInicio = DateTime.Today.AddMonths(-1); // Reporte del último mes, cambiar si se quieren más meses a -2, -3 etc.
             var fechaFin = DateTime.Today;
 
             var ventas = await _context.Ventas
-                .Where(v => v.FechaVenta >= fechaInicio && v.FechaVenta <= fechaFin)
+                .Where(v => v.FechaVenta >= fechaInicio && v.FechaVenta <= fechaFin) // Filtrar ventas por fecha
                 .ToListAsync();
 
             var ventasPorDia = await _context.Ventas
