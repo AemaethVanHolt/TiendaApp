@@ -1,0 +1,296 @@
+/* Estilos para alertas */
+.alert {
+    position: relative;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+}
+
+/* Estilos para el contenido de la alerta */
+.alert-heading {
+    color: inherit;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+.alert-link {
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+/* Estilos para el botón de cierre */
+.alert-dismissible {
+    padding-right: 3rem;
+}
+
+.alert-dismissible .btn-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    padding: 1.25rem 1rem;
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+    opacity: 0.5;
+    width: 1em;
+    height: 1em;
+    border: 0;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.alert-dismissible .btn-close:hover {
+    opacity: 0.75;
+}
+
+/* Estilos para los diferentes tipos de alertas */
+.alert-primary {
+    color: #084298;
+    background-color: #cfe2ff;
+    border-color: #b6d4fe;
+}
+
+.alert-primary .alert-link {
+    color: #06357a;
+}
+
+.alert-secondary {
+    color: #41464b;
+    background-color: #e2e3e5;
+    border-color: #d3d6d8;
+}
+
+.alert-secondary .alert-link {
+    color: #34383c;
+}
+
+.alert-success {
+    color: #0f5132;
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+}
+
+.alert-success .alert-link {
+    color: #0c4128;
+}
+
+.alert-danger {
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+}
+
+.alert-danger .alert-link {
+    color: #6a1a21;
+}
+
+.alert-warning {
+    color: #664d03;
+    background-color: #fff3cd;
+    border-color: #ffecb5;
+}
+
+.alert-warning .alert-link {
+    color: #523e02;
+}
+
+.alert-info {
+    color: #055160;
+    background-color: #cff4fc;
+    border-color: #b6effb;
+}
+
+.alert-info .alert-link {
+    color: #04414d;
+}
+
+.alert-light {
+    color: #636464;
+    background-color: #fefefe;
+    border-color: #fdfdfe;
+}
+
+.alert-light .alert-link {
+    color: #4f5050;
+}
+
+.alert-dark {
+    color: #141619;
+    background-color: #d3d3d4;
+    border-color: #bcbebf;
+}
+
+.alert-dark .alert-link {
+    color: #101214;
+}
+
+/* Estilos para alertas con iconos */
+.alert-icon {
+    display: flex;
+    align-items: flex-start;
+}
+
+.alert-icon i {
+    font-size: 1.25rem;
+    margin-right: 0.75rem;
+    margin-top: 0.2rem;
+}
+
+.alert-icon .alert-content {
+    flex: 1;
+}
+
+/* Estilos para alertas rellenadas */
+.alert-filled {
+    color: #fff;
+    border: none;
+}
+
+.alert-filled.alert-primary {
+    background-color: var(--primary-color);
+}
+
+.alert-filled.alert-secondary {
+    background-color: var(--secondary-color);
+}
+
+.alert-filled.alert-success {
+    background-color: var(--success-color);
+}
+
+.alert-filled.alert-danger {
+    background-color: var(--danger-color);
+}
+
+.alert-filled.alert-warning {
+    background-color: var(--warning-color);
+    color: #000;
+}
+
+.alert-filled.alert-info {
+    background-color: #0dcaf0;
+}
+
+.alert-filled .alert-link {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* Estilos para alertas con borde izquierdo */
+.alert-border-left {
+    border-left-width: 4px;
+    border-left-style: solid;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.alert-border-left.alert-primary {
+    border-left-color: var(--primary-color);
+}
+
+.alert-border-left.alert-secondary {
+    border-left-color: var(--secondary-color);
+}
+
+.alert-border-left.alert-success {
+    border-left-color: var(--success-color);
+}
+
+.alert-border-left.alert-danger {
+    border-left-color: var(--danger-color);
+}
+
+.alert-border-left.alert-warning {
+    border-left-color: var(--warning-color);
+}
+
+.alert-border-left.alert-info {
+    border-left-color: #0dcaf0;
+}
+
+/* Estilos para alertas con fondo claro */
+.alert-light-bg {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05);
+}
+
+/* Estilos para alertas flotantes */
+.alert-floating {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1080;
+    max-width: 350px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Estilos para alertas con contador */
+.alert-with-count {
+    position: relative;
+    padding-left: 3.5rem;
+}
+
+.alert-count {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2.5rem;
+    background-color: rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* Estilos para alertas con botones */
+.alert-with-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.alert-buttons {
+    margin-top: 0.5rem;
+    margin-left: auto;
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Estilos responsivos */
+@media (max-width: 767.98px) {
+    .alert {
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .alert-icon i {
+        font-size: 1.1rem;
+        margin-right: 0.5rem;
+    }
+    
+    .alert-floating {
+        left: 1rem;
+        right: 1rem;
+        max-width: none;
+    }
+}

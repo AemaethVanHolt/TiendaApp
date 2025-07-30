@@ -1,0 +1,232 @@
+@using TiendaApp.Models.ViewModels
+@model TiendaApp.Models.ViewModels.MetodoPagoViewModel
+
+@{
+    ViewData["Title"] = "Método de Pago";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Método de Pago</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading">Total a pagar: @Model.Total.ToString("C")</h5>
+                    </div>
+
+                    <form id="paymentForm" onsubmit="return false;" class="needs-validation" novalidate>
+                        @Html.AntiForgeryToken()
+                        <div class="mb-4">
+                            <h5 class="mb-3">Seleccione un método de pago:</h5>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="MetodoPagoSeleccionado" id="tarjeta" value="@MetodoPagoViewModel.MetodoTarjeta" checked>
+                                <label class="form-check-label fw-bold" for="tarjeta">
+                                    <i class="fas fa-credit-card me-2"></i>@MetodoPagoViewModel.MetodoTarjeta
+                                </label>
+                            </div>
+                            
+                            <div id="tarjetaDetalles" class="payment-method-details p-3 border rounded mb-3">
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">Número de tarjeta</label>
+                                        <input type="text" class="form-control" id="numeroTarjeta" name="TarjetaCredito.NumeroTarjeta" placeholder="1234 5678 9012 3456" maxlength="19">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Nombre del titular</label>
+                                        <input type="text" class="form-control" id="nombreTitular" name="TarjetaCredito.NombreTitular" placeholder="Como aparece en la tarjeta">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label class="form-label">Vencimiento</label>
+                                        <input type="text" class="form-control" id="fechaVencimiento" name="TarjetaCredito.FechaExpiracion" placeholder="MM/AA" maxlength="5">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label class="form-label">CVV</label>
+                                        <input type="text" class="form-control" id="cvv" name="TarjetaCredito.CVV" placeholder="123" maxlength="4">
+                                    </div>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="guardarTarjeta">
+                                    <label class="form-check-label" for="guardarTarjeta">
+                                        Guardar información de pago para futuras compras
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="MetodoPagoSeleccionado" id="transferencia" value="@MetodoPagoViewModel.MetodoTransferencia">
+                                <label class="form-check-label fw-bold" for="transferencia">
+                                    <i class="fas fa-university me-2"></i>@MetodoPagoViewModel.MetodoTransferencia
+                                </label>
+                            </div>
+                            
+                            <div id="transferenciaDetalles" class="payment-method-details p-3 border rounded mb-3" style="display: none;">
+                                <p>Realiza una transferencia a la siguiente cuenta bancaria:</p>
+                                <div class="bg-light p-3 rounded">
+                                    <p class="mb-1"><strong>Banco:</strong> Banco Ejemplo S.A.</p>
+                                    <p class="mb-1"><strong>Titular:</strong> Tu Tienda Online S.L.</p>
+                                    <p class="mb-1"><strong>IBAN:</strong> ES12 3456 7890 1234 5678 9012</p>
+                                    <p class="mb-0"><strong>Concepto:</strong> PEDIDO-@DateTime.Now.ToString("yyyyMMddHHmmss")</p>
+                                </div>
+                                <p class="mt-2 mb-0 text-muted small">* Tu pedido se procesará una vez recibido el pago.</p>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="MetodoPagoSeleccionado" id="paypal" value="@MetodoPagoViewModel.MetodoPaypal">
+                                <label class="form-check-label fw-bold" for="paypal">
+                                    <i class="fab fa-paypal me-2"></i>@MetodoPagoViewModel.MetodoPaypal
+                                </label>
+                            </div>
+                            
+                            <div id="paypalDetalles" class="payment-method-details p-3 border rounded mb-3" style="display: none;">
+                                <p>Serás redirigido a PayPal para completar tu pago de manera segura.</p>
+                                <div class="text-center">
+                                    <button type="button" class="btn btn-outline-primary" id="btnPagarPaypal">
+                                        <i class="fab fa-paypal me-2"></i>Pagar con PayPal
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="MetodoPagoSeleccionado" id="bizum" value="@MetodoPagoViewModel.MetodoBizum">
+                                <label class="form-check-label fw-bold" for="bizum">
+                                    <i class="fas fa-mobile-alt me-2"></i>@MetodoPagoViewModel.MetodoBizum
+                                </label>
+                            </div>
+                            
+                            <div id="bizumDetalles" class="payment-method-details p-3 border rounded mb-3" style="display: none;">
+                                <p>Paga de forma segura con Bizum.</p>
+                                <div class="mb-3">
+                                    <label class="form-label">Número de teléfono móvil</label>
+                                    <input type="tel" class="form-control" placeholder="6XX XXX XXX" pattern="[0-9]{9}">
+                                </div>
+                                <div class="alert alert-info small">
+                                    <i class="fas fa-info-circle me-2"></i>Recibirás un SMS con las instrucciones para completar el pago.
+                                </div>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="MetodoPagoSeleccionado" id="contrareembolso" value="Contra reembolso">
+                                <label class="form-check-label fw-bold" for="contrareembolso">
+                                    <i class="fas fa-truck me-2"></i>Contra reembolso
+                                </label>
+                            </div>
+                            
+                            <div id="contrareembolsoDetalles" class="payment-method-details p-3 border rounded mb-3" style="display: none;">
+                                <div class="mb-3">
+                                    <label class="form-label">Número de teléfono</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">+34</span>
+                                        <input type="tel" class="form-control" id="telefonoBizum" placeholder="612 345 678">
+                                    </div>
+                                </div>
+                                <p class="text-muted small">* Recibirás una notificación en tu móvil para confirmar el pago.</p>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="MetodoPagoSeleccionado" id="contraentrega" value="@MetodoPagoViewModel.MetodoContraReembolso">
+                                <label class="form-check-label fw-bold" for="contraentrega">
+                                    <i class="fas fa-truck me-2"></i>Pago @MetodoPagoViewModel.MetodoContraReembolso
+                                    <span class="badge bg-warning text-dark ms-2">+2,50€</span>
+                                </label>
+                            </div>
+                            
+                            <div id="contraentregaDetalles" class="payment-method-details p-3 border rounded mb-3" style="display: none;">
+                                <p>Puedes pagar en efectivo o con tarjeta cuando recibas tu pedido.</p>
+                                <div class="alert alert-info mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Se aplicará un recargo de 2,50€ por gastos de gestión.
+                                    <div class="mt-2 fw-bold">Total a pagar: @((Model.Total + 2.50m).ToString("C"))</div>
+                                </div>
+                                <div class="text-center">
+                                    <button type="button" class="btn btn-success btn-lg" id="btnPagarContraReembolso">
+                                        <i class="fas fa-check-circle me-2"></i>Confirmar pedido contra reembolso
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="button" id="btnPagar" class="btn btn-primary btn-lg">
+                                <i class="bi bi-credit-card"></i> <span id="btnPagarText">Pagar @Model.Total.ToString("C")</span>
+                            </button>
+                            <a href="@Url.Action("VerCarrito", "Carrito")" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Volver al carrito
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function procesarPago() {
+            console.log('Procesando pago...');
+            const btnPagar = $('#btnPagar, #btnPagarContraReembolso');
+            const originalBtnText = btnPagar.html();
+            const token = $('input[name="__RequestVerificationToken"]').val();
+            
+            // Mostrar loading
+            btnPagar.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status"></span> Procesando...');
+            
+            // Simular petición AJAX
+            setTimeout(function() {
+                // Hacer la petición real
+                $.ajax({
+                    url: '/Pago/ProcesarContrarreembolso',
+                    type: 'POST',
+                    data: { __RequestVerificationToken: token },
+                    success: function(response) {
+                        console.log('Respuesta del servidor:', response);
+                        if (response.success) {
+                            window.location.href = response.redirectUrl || '/Pago/Confirmacion';
+                        } else {
+                            alert(response.message || 'Error al procesar el pago');
+                            btnPagar.prop('disabled', false).html(originalBtnText);
+                        }
+                    },
+                    error: function() {
+                        alert('Error al conectar con el servidor');
+                        btnPagar.prop('disabled', false).html(originalBtnText);
+                    }
+                });
+            }, 500);
+        }
+
+        $(document).ready(function() {
+            console.log('Documento listo');
+            
+            // Mostrar/ocultar detalles del método de pago
+            $('input[name="MetodoPagoSeleccionado"]').change(function() {
+                $('.payment-method-details').hide();
+                const metodo = $(this).val();
+                
+                if (metodo === 'Tarjeta') {
+                    $('#tarjetaDetalles').show();
+                } else if (metodo === 'Transferencia') {
+                    $('#transferenciaDetalles').show();
+                } else if (metodo === 'PayPal') {
+                    $('#paypalDetalles').show();
+                } else if (metodo === 'Bizum') {
+                    $('#bizumDetalles').show();
+                } else if (metodo === 'Contra reembolso') {
+                    $('#contraentregaDetalles').show();
+                }
+            });
+            
+            // Mostrar el método por defecto
+            $('input[name="MetodoPagoSeleccionado"]:checked').trigger('change');
+            
+            // Manejar clic en cualquier botón de pago
+            $(document).on('click', '#btnPagar, #btnPagarContraReembolso', function(e) {
+                e.preventDefault();
+                procesarPago();
+            });
+        });
+    </script>
+}

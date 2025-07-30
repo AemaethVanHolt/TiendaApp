@@ -1,0 +1,127 @@
+@using TiendaApp.Models
+@model Producto
+
+@{
+    ViewData["Title"] = "Nuevo Producto";
+}
+
+<h1>Nuevo Producto</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="Descripcion" class="form-label"></label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+            
+                    <div class="row">
+                        <div class="form-group col-md-6 mb-3">
+                            <label asp-for="Precio" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="Precio" class="form-control" />
+                            </div>
+                            <span asp-validation-for="Precio" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group col-md-6 mb-3">
+                            <label asp-for="Stock" class="form-label"></label>
+                            <input asp-for="Stock" class="form-control" />
+                            <span asp-validation-for="Stock" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group form-check mb-3">
+                        <label class="form-check-label">
+                            <input class="form-check-input" asp-for="Activo" /> @Html.DisplayNameFor(model => model.Activo)
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Imagen del Producto</label>
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <img id="imagenPrevia" src="https://via.placeholder.com/300x200?text=Sin+imagen" class="img-fluid rounded" alt="Vista previa de la imagen">
+                                </div>
+                                <div class="custom-file">
+                                    <input type="file" class="form-control" id="imagenArchivo" name="imagenArchivo" accept="image/*" onchange="mostrarVistaPrevia(this)">
+                                    <div class="form-text">Formatos soportados: JPG, JPEG, PNG. Tamaño máximo: 5MB</div>
+                                    <span class="text-danger" id="errorImagen"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Guardar Producto
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver al listado
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        function mostrarVistaPrevia(input) {
+            const preview = document.getElementById('imagenPrevia');
+            const errorSpan = document.getElementById('errorImagen');
+            const file = input.files[0];
+            
+            // Validar tamaño máximo (5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB en bytes
+            
+            if (file && file.size > maxSize) {
+                errorSpan.textContent = 'El archivo es demasiado grande. El tamaño máximo permitido es 5MB.';
+                input.value = '';
+                preview.src = 'https://via.placeholder.com/300x200?text=Imagen+demasiado+grande';
+                return;
+            }
+            
+            // Validar tipo de archivo
+            const tiposPermitidos = ['image/jpeg', 'image/png', 'image/jpg'];
+            if (file && !tiposPermitidos.includes(file.type)) {
+                errorSpan.textContent = 'Formato de archivo no soportado. Use JPG, JPEG o PNG.';
+                input.value = '';
+                preview.src = 'https://via.placeholder.com/300x200?text=Formato+no+válido';
+                return;
+            }
+            
+            // Si todo está bien, mostrar vista previa
+            errorSpan.textContent = '';
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = 'https://via.placeholder.com/300x200?text=Sin+imagen';
+            }
+        }
+    </script>
+}

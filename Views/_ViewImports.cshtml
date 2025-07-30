@@ -1,0 +1,12 @@
+@using TiendaApp
+@using TiendaApp.Models
+@using Microsoft.AspNetCore.Antiforgery
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers.Partial
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions{
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf?.GetAndStoreTokens(Context)?.RequestToken ?? string.Empty;
+    }
+}

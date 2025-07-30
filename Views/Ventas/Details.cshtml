@@ -1,0 +1,161 @@
+@model TiendaApp.Models.ViewModels.VentaDetalleViewModel
+
+@{
+    ViewData["Title"] = "Detalles de Venta";
+    ViewData["ActivePage"] = "Ventas";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">@ViewData["Title"]</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a asp-action="Index">Ventas</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Detalles</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-2"></i>Volver al listado
+            </a>
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print me-1"></i> Imprimir
+            </button>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header bg-light py-3">
+            <h5 class="mb-0">Información de la Venta</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h6 class="text-muted">Información del Cliente</h6>
+                    <p class="mb-1">
+                        <strong>Cliente:</strong> @(Model.Venta.Usuario?.Nombre ?? Model.Venta.Usuario?.Email)
+                    </p>
+                    <p class="mb-1">
+                        <strong>Email:</strong> @Model.Venta.Usuario?.Email
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h6 class="text-muted">Detalles de la Venta</h6>
+                    <p class="mb-1">
+                        <strong>N° Venta:</strong> @Model.Venta.Id
+                    </p>
+                    <p class="mb-1">
+                        <strong>Fecha:</strong> @Model.Venta.FechaVenta.ToString("dd/MM/yyyy HH:mm")
+                    </p>
+                    <p class="mb-1">
+                        <strong>Estado:</strong> 
+                        <span class="badge bg-success">@Model.Venta.Estado</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Producto</th>
+                            <th class="text-center">Precio Unitario</th>
+                            <th class="text-center">Cantidad</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detalle in Model.Detalles)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        @if (detalle.Producto != null)
+                                        {
+                                            @if (!string.IsNullOrEmpty(detalle.Producto.ImagenUrl))
+                                            {
+                                                <img src="@detalle.Producto.ImagenUrl" 
+                                                    alt="@(detalle.Producto.Nombre ?? "Producto")" 
+                                                    class="img-thumbnail me-3" 
+                                                    style="width: 60px; height: 60px; object-fit: contain;">
+                                            }
+                                            <div>
+                                                <h6 class="mb-0">@(detalle.Producto.Nombre ?? "Producto eliminado")</h6>
+                                                <small class="text-muted">@(detalle.Producto.Tipo ?? "Tipo no disponible")</small>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                <h6 class="mb-0">Producto no disponible</h6>
+                                                <small class="text-muted">ID: @detalle.ProductoId</small>
+                                            </div>
+                                        }
+                                    </div>
+                                </td>
+                                <td class="text-center">@detalle.PrecioUnitario.ToString("C")</td>
+                                <td class="text-center">@detalle.Cantidad</td>
+                                <td class="text-end">@detalle.Total.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                            <td class="text-end">@Model.Subtotal.ToString("C")</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>IVA (21%):</strong></td>
+                            <td class="text-end">@Model.Iva.ToString("C")</td>
+                        </tr>
+                        <tr class="table-active">
+                            <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                            <td class="text-end"><strong>@Model.Total.ToString("C")</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Venta.Comentarios))
+    {
+        <div class="card shadow mb-4">
+            <div class="card-header bg-light py-3">
+                <h5 class="mb-0">Comentarios</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">@Model.Venta.Comentarios</p>
+            </div>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        
+        .img-thumbnail {
+            padding: 0.25rem;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .badge {
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.35em 0.65em;
+        }
+        
+        .bg-success {
+            background-color: #198754 !important;
+        }
+    </style>
+}

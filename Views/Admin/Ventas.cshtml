@@ -1,0 +1,169 @@
+@model IEnumerable<TiendaApp.Models.Venta>
+
+@{
+    ViewData["Title"] = "Ventas";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-shopping-cart me-2"></i>Historial de Ventas</h2>
+        <button class="btn btn-primary" onclick="window.print()">
+            <i class="fas fa-print me-1"></i> Imprimir
+        </button>
+    </div>
+    
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            No hay ventas registradas aún.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th># Venta</th>
+                        <th>Fecha y Hora</th>
+                        <th>Cliente</th>
+                        <th>Productos Comprados</th>
+                        <th class="text-end">Total</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var venta in Model.OrderByDescending(v => v.FechaVenta))
+                    {
+                        <tr>
+                            <td>@venta.Id</td>
+                            <td>@venta.FechaVenta.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                @if (venta.Usuario != null)
+                                {
+                                    <div>@(venta.Usuario.Nombre ?? venta.Usuario.Email)</div>
+                                    <small class="text-muted">@venta.Usuario.Email</small>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Usuario eliminado</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Producto</th>
+                                                <th class="text-center">Cantidad</th>
+                                                <th class="text-end">Precio Unit.</th>
+                                                <th class="text-end">Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var detalle in venta.DetallesVenta)
+                                            {
+                                                <tr>
+                                                    <td>@detalle.Producto?.Nombre</td>
+                                                    <td class="text-center">@detalle.Cantidad</td>
+                                                    <td class="text-end">@detalle.PrecioUnitario.ToString("C")</td>
+                                                    <td class="text-end">@((detalle.Cantidad * detalle.PrecioUnitario).ToString("C"))</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                            <td class="text-end fw-bold">@venta.Total.ToString("C")</td>
+                            <td>
+                                @{
+                                    var estadoClass = "bg-secondary";
+                                    if (venta.Estado == "Completada") estadoClass = "bg-success";
+                                    else if (venta.Estado == "Cancelada") estadoClass = "bg-danger";
+                                    else if (venta.Estado == "En Proceso") estadoClass = "bg-warning";
+                                }
+                                <span class="badge @estadoClass">@venta.Estado</span>
+                            </td>
+                            <td class="text-center">
+                                <a asp-action="Details" asp-route-id="@venta.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> Detalles
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="table-dark">
+                        <td colspan="4" class="text-end fw-bold">Total General:</td>
+                        <td class="text-end fw-bold">@Model.Sum(v => v.Total).ToString("C")</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Ajustes para la tabla de ventas */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .table {
+            min-width: 100%;
+            table-layout: auto;
+        }
+        
+        /* Ajustes específicos de columnas */
+        th:nth-child(1), td:nth-child(1) { width: 80px; } /* # Venta */
+        th:nth-child(2), td:nth-child(2) { width: 140px; } /* Fecha y Hora */
+        th:nth-child(3), td:nth-child(3) { width: 200px; } /* Cliente */
+        th:nth-child(4), td:nth-child(4) { min-width: 300px; } /* Productos */
+        th:nth-child(5), td:nth-child(5) { width: 120px; } /* Total */
+        th:nth-child(6), td:nth-child(6) { width: 120px; } /* Estado */
+        
+        /* Asegurar que el texto no se desborde */
+        td {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 0;
+        }
+        
+        /* Ajustar el contenedor principal */
+        .container {
+            max-width: 100%;
+            padding-right: 1.5rem;
+            padding-left: 1.5rem;
+        }
+        .table > :not(:first-child) {
+            border-top: 2px solid #dee2e6;
+        }
+        .table-sm td, .table-sm th {
+            padding: 0.3rem;
+        }
+        @@media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                font-size: 11pt;
+            }
+            .table {
+                font-size: 10pt;
+            }
+            .table th, .table td {
+                padding: 0.3rem;
+            }
+        }
+    </style>
+}

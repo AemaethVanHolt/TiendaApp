@@ -1,0 +1,264 @@
+@model TiendaApp.Models.ViewModels.UsuarioViewModel
+
+@{
+    ViewData["Title"] = "Mi Perfil";
+    ViewData["ActivePage"] = "Perfil";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        @if (!string.IsNullOrEmpty(Model.ProfileImageUrl))
+                        {
+                            <img src="@Model.ProfileImageUrl" alt="Foto de perfil" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                        }
+                        else
+                        {
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 150px; height: 150px;">
+                                <i class="fas fa-user fa-4x text-secondary"></i>
+                            </div>
+                        }
+                    </div>
+                    <h4 class="card-title">@Model.Nombre @Model.Apellidos</h4>
+                    <p class="text-muted">@Model.Rol</p>
+                    
+                    <div class="d-flex justify-content-center gap-2 mb-3">
+                        @if (Model.Email != null)
+                        {
+                            <a href="mailto:@Model.Email" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Telefono))
+                        {
+                            <a href="tel:@Model.Telefono" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-phone"></i>
+                            </a>
+                        }
+                    </div>
+                    
+                    <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Editar Perfil
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Información de Contacto</h6>
+                </div>
+                <div class="card-body">
+                    <dl class="mb-0">
+                        <dt class="small text-muted">Correo Electrónico</dt>
+                        <dd class="mb-2">@Model.Email</dd>
+                        
+                        @if (!string.IsNullOrEmpty(Model.Telefono))
+                        {
+                            <dt class="small text-muted">Teléfono</dt>
+                            <dd class="mb-2">@Model.Telefono</dd>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(Model.Direccion))
+                        {
+                            <dt class="small text-muted">Dirección</dt>
+                            <dd class="mb-2">@Model.Direccion</dd>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(Model.Ciudad) || !string.IsNullOrEmpty(Model.Provincia) || !string.IsNullOrEmpty(Model.CodigoPostal))
+                        {
+                            <dt class="small text-muted">Ubicación</dt>
+                            <dd class="mb-0">
+                                @if (!string.IsNullOrEmpty(Model.Ciudad) && !string.IsNullOrEmpty(Model.Provincia))
+                                {
+                                    @($"{Model.Ciudad}, {Model.Provincia}")
+                                }
+                                else if (!string.IsNullOrEmpty(Model.Ciudad))
+                                {
+                                    @Model.Ciudad
+                                }
+                                else if (!string.IsNullOrEmpty(Model.Provincia))
+                                {
+                                    @Model.Provincia
+                                }
+                                
+                                @if (!string.IsNullOrEmpty(Model.CodigoPostal))
+                                {
+                                    <br />@Model.CodigoPostal
+                                }
+                            </dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <ul class="nav nav-tabs card-header-tabs" id="profileTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">
+                                <i class="fas fa-user me-2"></i>Detalles
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab" aria-controls="activity" aria-selected="false">
+                                <i class="fas fa-chart-line me-2"></i>Actividad
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">
+                                <i class="fas fa-cog me-2"></i>Configuración
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="profileTabsContent">
+                        <!-- Pestaña de Detalles -->
+                        <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+                            <h5 class="mb-4">Información del Perfil</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <dl>
+                                        <dt class="text-muted small">Nombre</dt>
+                                        <dd class="mb-3">@Model.Nombre</dd>
+                                        
+                                        <dt class="text-muted small">Apellidos</dt>
+                                        <dd class="mb-3">@(string.IsNullOrEmpty(Model.Apellidos) ? "No especificado" : Model.Apellidos)</dd>
+                                        
+                                        <dt class="text-muted small">Correo Electrónico</dt>
+                                        <dd class="mb-3">@Model.Email</dd>
+                                    </dl>
+                                </div>
+                                <div class="col-md-6">
+                                    <dl>
+                                        <dt class="text-muted small">Teléfono</dt>
+                                        <dd class="mb-3">@(string.IsNullOrEmpty(Model.Telefono) ? "No especificado" : Model.Telefono)</dd>
+                                        
+                                        <dt class="text-muted small">Dirección</dt>
+                                        <dd class="mb-3">@(string.IsNullOrEmpty(Model.Direccion) ? "No especificada" : Model.Direccion)</dd>
+                                        
+                                        <dt class="text-muted small">Ciudad</dt>
+                                        <dd class="mb-3">@(string.IsNullOrEmpty(Model.Ciudad) ? "No especificada" : Model.Ciudad)</dd>
+                                        
+                                        <dt class="text-muted small">Código Postal</dt>
+                                        <dd class="mb-3">@(string.IsNullOrEmpty(Model.CodigoPostal) ? "No especificado" : Model.CodigoPostal)</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h6 class="mb-3">Información de la Cuenta</h6>
+                                <dl class="row">
+                                    <dt class="col-sm-4 text-muted small">Rol</dt>
+                                    <dd class="col-sm-8">
+                                        <span class="badge bg-primary">@Model.Rol</span>
+                                    </dd>
+                                    
+                                    <dt class="col-sm-4 text-muted small">Estado</dt>
+                                    <dd class="col-sm-8">
+                                        @if (Model.EstaActivo)
+                                        {
+                                            <span class="badge bg-success">Activo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Inactivo</span>
+                                        }
+                                    </dd>
+                                    
+                                    <dt class="col-sm-4 text-muted small">Miembro desde</dt>
+                                    <dd class="col-sm-8">@Model.FechaRegistro.ToString("dd/MM/yyyy")</dd>
+                                    
+                                    @if (Model.UltimoAcceso.HasValue)
+                                    {
+                                        <dt class="col-sm-4 text-muted small">Último acceso</dt>
+                                        <dd class="col-sm-8">@Model.UltimoAcceso.Value.ToString("dd/MM/yyyy HH:mm")</dd>
+                                    }
+                                </dl>
+                            </div>
+                        </div>
+                        
+                        <!-- Pestaña de Actividad -->
+                        <div class="tab-pane fade" id="activity" role="tabpanel" aria-labelledby="activity-tab">
+                            <div class="text-center py-5">
+                                <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                                <h5>Actividad del Usuario</h5>
+                                <p class="text-muted">Aquí se mostrará la actividad reciente del usuario.</p>
+                                
+                                <div class="mt-4">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Último inicio de sesión:</span>
+                                        <span class="fw-medium">
+                                            @(Model.UltimoAcceso.HasValue ? Model.UltimoAcceso.Value.ToString("dd/MM/yyyy HH:mm") : "Nunca")
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pestaña de Configuración -->
+                        <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <span>Configuración de la cuenta y preferencias de usuario.</span>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h6 class="mb-3">Opciones de la Cuenta</h6>
+                                
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                                    <label class="form-check-label" for="emailNotifications">
+                                        Recibir notificaciones por correo electrónico
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="darkMode">
+                                    <label class="form-check-label" for="darkMode">
+                                        Modo oscuro
+                                    </label>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <a href="#" class="btn btn-outline-primary me-2">
+                                        <i class="fas fa-key me-2"></i>Cambiar contraseña
+                                    </a>
+                                    <a href="#" class="btn btn-outline-danger">
+                                        <i class="fas fa-trash-alt me-2"></i>Eliminar cuenta
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Inicializar los tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Inicializar los tabs
+            var tabEls = document.querySelectorAll('button[data-bs-toggle="tab"]');
+            tabEls.forEach(function(tabEl) {
+                tabEl.addEventListener('shown.bs.tab', function (event) {
+                    event.target // tab activo recién activado
+                    event.relatedTarget // tab anterior activo (si está disponible)
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,246 @@
+@model TiendaApp.Models.Carrito
+@using Microsoft.AspNetCore.Antiforgery
+@inject IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = "Carrito de Compras";
+}
+
+@{
+    var token = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+}
+
+<input type="hidden" id="RequestVerificationToken" name="__RequestVerificationToken" value="@token" />
+
+<div class="container py-5">
+    <h1 class="mb-4">
+        <i class="fas fa-shopping-cart me-2"></i>@ViewData["Title"]
+    </h1>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
+            <h3>Tu carrito está vacío</h3>
+            <p class="text-muted">Añade algunos productos para comenzar a comprar</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-3">
+                <i class="fas fa-arrow-left me-2"></i>Continuar Comprando
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 120px">Imagen</th>
+                                <th>Producto</th>
+                                <th class="text-center">Precio Unitario</th>
+                                <th class="text-center">Cantidad</th>
+                                <th class="text-end">Subtotal</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.ImagenUrl))
+                                        {
+                                            <img src="@item.ImagenUrl" alt="@item.Nombre" class="img-fluid rounded" style="max-height: 80px;">
+                                        }
+                                        else
+                                        {
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                                <i class="fas fa-image text-muted"></i>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td class="align-middle">
+                                        <h6 class="mb-0">@item.Nombre</h6>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        @item.Precio.ToString("C")
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <button class="btn btn-sm btn-outline-secondary btn-update-quantity" 
+                                                    data-product-id="@item.ProductoId" 
+                                                    data-action="decrease">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <input type="number" 
+                                                   class="form-control form-control-sm quantity-input mx-1" 
+                                                   value="@item.Cantidad" 
+                                                   min="1" 
+                                                   data-product-id="@item.ProductoId" 
+                                                   style="width: 60px; text-align: center;">
+                                            <button class="btn btn-sm btn-outline-secondary btn-update-quantity" 
+                                                    data-product-id="@item.ProductoId" 
+                                                    data-action="increase">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="align-middle text-end">
+                                        <span class="fw-bold item-subtotal">@((item.Precio * item.Cantidad).ToString("C"))</span>
+                                    </td>
+                                    <td class="align-middle text-end">
+                                        <button class="btn btn-sm btn-outline-danger remove-from-cart" data-producto-id="@item.ProductoId">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white">
+                <div class="row">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Seguir Comprando
+                        </a>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Total:</h5>
+                            <h4 class="mb-0 text-primary" id="cart-total">
+                                @Model.Total.ToString("C")
+                            </h4>
+                        </div>
+                        <a id="checkout-btn" asp-controller="Pago" asp-action="MetodoPago" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-credit-card me-2"></i>Proceder al Pago
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/cart-dropdown.js"></script>
+    <script>
+        // Función para actualizar la cantidad (compatibilidad con el código anterior)
+        function updateQuantity(productId, quantity) {
+            // Asegurarse de que la cantidad sea un número válido
+            quantity = parseInt(quantity) || 1;
+            if (quantity < 1) quantity = 1;
+            
+            // Usar la nueva función de actualización
+            updateCartItemQuantity(productId, quantity);
+        }
+        
+        $(document).ready(function() {
+            // Actualizar cantidad
+            $('.update-quantity').on('click', function() {
+                const button = $(this);
+                const productId = button.data('producto-id');
+                const action = button.data('action');
+                const input = $(`input[data-producto-id="${productId}"]`);
+                let quantity = parseInt(input.val());
+
+                if (action === 'increase') {
+                    quantity++;
+                } else if (action === 'decrease' && quantity > 1) {
+                    quantity--;
+                }
+
+                input.val(quantity);
+                actualizarCantidad(productId, quantity);
+            });
+
+            // Eliminar producto
+            $('.remove-from-cart').on('click', function() {
+                if (confirm('¿Estás seguro de que deseas eliminar este producto del carrito?')) {
+                    const productId = $(this).data('producto-id');
+                    eliminarDelCarrito(productId);
+                }
+            });
+
+            // Actualizar cantidad manualmente
+            $('.quantity-input').on('change', function() {
+                const productId = $(this).data('producto-id');
+                const quantity = parseInt($(this).val());
+                
+                if (quantity > 0) {
+                    actualizarCantidad(productId, quantity);
+                } else {
+                    $(this).val(1);
+                }
+            });
+
+            // Proceder al pago
+            $('#checkout-btn').on('click', function() {
+                realizarCompra();
+            });
+
+            function actualizarCantidad(productoId, cantidad) {
+                $.ajax({
+                    url: '/Carrito/ActualizarCantidad',
+                    type: 'POST',
+                    data: {
+                        productoId: productoId,
+                        cantidad: cantidad
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Actualizar totales
+                            $('#cart-total').text(response.total);
+                            // Actualizar contador en el navbar
+                            $('#cartCount').text(response.totalItems);
+                        } else {
+                            alert('Error al actualizar la cantidad: ' + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Error al conectar con el servidor');
+                    }
+                });
+            }
+
+            function eliminarDelCarrito(productoId) {
+                $.ajax({
+                    url: '/Carrito/EliminarDelCarrito',
+                    type: 'POST',
+                    data: {
+                        productoId: productoId
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Recargar la página para actualizar la vista
+                            location.reload();
+                        } else {
+                            alert('Error al eliminar el producto: ' + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Error al conectar con el servidor');
+                    }
+                });
+            }
+
+            function realizarCompra() {
+                // Redirigir a la página de pago
+                window.location.href = '/Pago/MetodoPago';
+            }
+            
+            // Función para actualizar la cantidad
+            function updateQuantity(productoId, cantidad) {
+                if (cantidad < 1) cantidad = 1;
+                if (cantidad > 100) cantidad = 100;
+                
+                // Actualizar la cantidad en el input
+                $(`#qty-${productoId}`).val(cantidad);
+                
+                // Llamar a la función para actualizar en el servidor
+                actualizarCantidad(productoId, cantidad);
+            }
+        });
+    </script>
+}

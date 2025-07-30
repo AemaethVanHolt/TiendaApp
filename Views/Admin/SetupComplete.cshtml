@@ -1,0 +1,30 @@
+@{
+    ViewData["Title"] = "Configuración de Administrador";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="text-center">Configuración de Administrador</h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h4 class="alert-heading">Estado de la configuración:</h4>
+                        <p>@ViewBag.Message</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>¿Qué hacer a continuación?</h5>
+                        <ul>
+                            <li><a href="/Usuarios">Ir al listado de usuarios</a></li>
+                            <li><a href="/">Volver al inicio</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,154 @@
+@model IEnumerable<TiendaApp.Models.Producto>
+
+@{
+    ViewData["Title"] = "Gestión de Almacén";
+}
+
+<h1>Gestión de Almacén</h1>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nuevo Producto
+        </a>
+    </div>
+    <div class="col-md-6">
+        <form asp-action="Index" method="get" class="form-inline float-right">
+            <div class="input-group">
+                <input type="text" name="filtro" class="form-control" placeholder="Buscar..." value="@ViewData["Filtro"]" />
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-outline-secondary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>
+                        <a asp-action="Index" 
+                           asp-route-orden="nombre" 
+                           asp-route-direccion="@ViewData["DireccionNombre"]"
+                           asp-route-filtro="@ViewData["Filtro"]">
+                            Nombre
+                            @if (ViewData["OrdenActual"]?.ToString() == "nombre")
+                            {
+                                <i class="fas @(ViewData["DireccionActual"]?.ToString() == "asc" ? "fa-sort-up" : "fa-sort-down")"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-sort"></i>
+                            }
+                        </a>
+                    </th>
+                    <th>Descripción</th>
+                    <th>
+                        <a asp-action="Index" 
+                           asp-route-orden="precio" 
+                           asp-route-direccion="@ViewData["DireccionPrecio"]"
+                           asp-route-filtro="@ViewData["Filtro"]">
+                            Precio
+                            @if (ViewData["OrdenActual"]?.ToString() == "precio")
+                            {
+                                <i class="fas @(ViewData["DireccionActual"]?.ToString() == "asc" ? "fa-sort-up" : "fa-sort-down")"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-sort"></i>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" 
+                           asp-route-orden="stock" 
+                           asp-route-direccion="@ViewData["DireccionStock"]"
+                           asp-route-filtro="@ViewData["Filtro"]">
+                            Stock
+                            @if (ViewData["OrdenActual"]?.ToString() == "stock")
+                            {
+                                <i class="fas @(ViewData["DireccionActual"]?.ToString() == "asc" ? "fa-sort-up" : "fa-sort-down")"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-sort"></i>
+                            }
+                        </a>
+                    </th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Nombre</td>
+                        <td>@(item.Descripcion?.Length > 50 ? item.Descripcion.Substring(0, 50) + "..." : item.Descripcion)</td>
+                        <td>@item.Precio.ToString("C")</td>
+                        <td>
+                            <span class="badge @(item.Stock > 10 ? "bg-success" : item.Stock > 0 ? "bg-warning" : "bg-danger")">
+                                @item.Stock
+                            </span>
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger" 
+                               onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">No se encontraron productos.</div>
+}
+
+@section Styles {
+    <style>
+        .badge {
+            font-size: 0.9em;
+            min-width: 50px;
+            padding: 0.5em;
+        }
+        
+        .table th {
+            white-space: nowrap;
+        }
+        
+        .table td {
+            vertical-align: middle;
+        }
+        
+        .table th a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .table th a:hover {
+            text-decoration: underline;
+        }
+        
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            border-radius: 0.2rem;
+        }
+    </style>
+}

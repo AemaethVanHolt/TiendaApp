@@ -1,0 +1,171 @@
+/* 
+ * Estilos globales de la aplicación
+ * Los estilos específicos de componentes están en la carpeta /css/components/
+ * Los estilos específicos de vistas están en la carpeta /css/views/
+ */
+
+/* Variables globales */
+:root {
+    --primary-color: #25477ba4;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --border-color: #e9ecef;
+    --text-muted: #6c757d;
+}
+
+/* Estilos base */
+html {
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--dark-color);
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Fondo de pantalla */
+body {
+    background-image: url('/images/pagina/wallpaper.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-color: #f8f9fa; /* Color de respaldo */
+    min-height: 100vh;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Capa oscura sobre la imagen */
+    z-index: 0;
+}
+
+/* Asegurar que el contenido sea legible sobre el fondo */
+.main-content {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    padding-top: 80px; /* Espacio para el navbar fijo */
+    padding-bottom: 100px; /* Espacio para el footer */
+    min-height: calc(100vh - 180px); /* Altura mínima para que el footer quede abajo */
+    background-color: rgba(255, 255, 255, 0.9); /* Fondo semitransparente para mejorar la legibilidad */
+    backdrop-filter: blur(5px); /* Efecto de desenfoque sutil */
+    -webkit-backdrop-filter: blur(5px); /* Para compatibilidad con Safari */
+}
+
+/* Tipografía */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--dark-color);
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+/* Enlaces */
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: #0a58ca;
+    text-decoration: none;
+}
+
+/* Utilidades */
+.container {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+@media (min-width: 576px) {
+    .container {
+        max-width: 540px;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 720px;
+    }
+}
+
+@media (min-width: 992px) {
+    .container {
+        max-width: 960px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px;
+    }
+}
+
+/* Utilidades de espaciado */
+.mt-6 {
+    margin-top: 4rem !important;
+}
+
+.mb-6 {
+    margin-bottom: 4rem !important;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Importar estilos de componentes */
+@import 'components/navbar.css';
+@import 'components/footer.css';
+@import 'components/buttons.css';
+@import 'components/cards.css';
+@import 'components/forms.css';
+@import 'components/tables.css';
+@import 'components/alerts.css';
+@import 'components/dropdowns.css';
+
+/* Importar estilos de vistas */
+@import 'views/cart.css';
+@import 'views/checkout.css';

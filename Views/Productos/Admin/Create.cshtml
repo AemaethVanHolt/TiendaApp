@@ -1,0 +1,172 @@
+@model TiendaApp.Models.Producto
+
+@{
+    ViewData["Title"] = "Nuevo Producto";
+    ViewData["ActivePage"] = "Productos";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">@ViewData["Title"]</h1>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver a la lista
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <form asp-action="Create" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Nombre" class="form-label"></label>
+                            <input asp-for="Nombre" class="form-control" />
+                            <span asp-validation-for="Nombre" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label asp-for="Descripcion" class="control-label"></label>
+                            <textarea asp-for="Descripcion" class="form-control"></textarea>
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Tipo" class="control-label"></label>
+                            <select asp-for="Tipo" class="form-control">
+                                <option value="">-- Seleccione un tipo --</option>
+                                <option value="Teléfonos">Teléfonos</option>
+                                <option value="Tablets">Tablets</option>
+                                <option value="Portátiles">Portátiles</option>
+                                <option value="Monitores">Monitores</option>
+                                <option value="Periféricos">Periféricos</option>
+                                <option value="Audio">Audio</option>
+                                <option value="Fotografía">Fotografía</option>
+                                <option value="Wearables">Wearables</option>
+                                <option value="Almacenamiento">Almacenamiento</option>
+                            </select>
+                            <span asp-validation-for="Tipo" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Precio" class="form-label"></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">€</span>
+                                        <input asp-for="Precio" class="form-control" type="number" step="0.01" min="0" />
+                                    </div>
+                                    <span asp-validation-for="Precio" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Stock" class="form-label"></label>
+                                    <input asp-for="Stock" class="form-control" type="number" min="0" />
+                                    <span asp-validation-for="Stock" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" asp-for="Activo" checked>
+                            <label class="form-check-label" asp-for="Activo"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Imagen del producto</label>
+                            <div class="image-upload-container mb-3">
+                                <div class="image-preview" id="imagePreview">
+                                    <img src="" alt="Vista previa de la imagen" class="image-preview__image" style="display: none;">
+                                    <div class="image-preview__default-text">
+                                        <i class="fas fa-image fa-3x text-muted mb-2"></i>
+                                        <p class="mb-0">Vista previa de la imagen</p>
+                                    </div>
+                                </div>
+                                <input type="file" class="form-control" id="imagenArchivo" name="imagenArchivo" accept="image/*">
+                                <span class="text-muted small">Formatos admitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</span>
+                                <span asp-validation-for="ImagenUrl" class="text-danger d-block"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary me-md-2">
+                        <i class="fas fa-times me-1"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .image-upload-container {
+            text-align: center;
+        }
+        
+        .image-preview {
+            width: 100%;
+            height: 250px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            background-color: #f8f9fa;
+        }
+        
+        .image-preview__image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+        
+        .image-preview__default-text {
+            text-align: center;
+            color: #6c757d;
+            padding: 1rem;
+        }
+    </style>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Vista previa de la imagen
+        const imageUpload = document.getElementById('imagenArchivo');
+        const imagePreview = document.querySelector('.image-preview__image');
+        const defaultText = document.querySelector('.image-preview__default-text');
+        
+        imageUpload.addEventListener('change', function() {
+            const file = this.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                    defaultText.style.display = 'none';
+                }
+                
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.src = '';
+                imagePreview.style.display = 'none';
+                defaultText.style.display = 'block';
+            }
+        });
+    </script>
+}

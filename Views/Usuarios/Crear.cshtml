@@ -1,0 +1,185 @@
+@model TiendaApp.Models.ViewModels.UsuarioCreateViewModel
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "Nuevo Usuario";
+    ViewData["ActivePage"] = "Usuarios";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">@ViewData["Title"]</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a asp-action="Index">Usuarios</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Nuevo</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Cancelar
+            </a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-light py-3">
+                    <h5 class="mb-0">Información del Usuario</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Crear" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Nombre" class="form-label"></label>
+                                    <input asp-for="Nombre" class="form-control" />
+                                    <span asp-validation-for="Nombre" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Apellidos" class="form-label"></label>
+                                    <input asp-for="Apellidos" class="form-control" />
+                                    <span asp-validation-for="Apellidos" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Email" class="form-label"></label>
+                                    <input asp-for="Email" class="form-control" />
+                                    <span asp-validation-for="Email" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Telefono" class="form-label"></label>
+                                    <input asp-for="Telefono" class="form-control" />
+                                    <span asp-validation-for="Telefono" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <label asp-for="Direccion" class="form-label"></label>
+                            <textarea asp-for="Direccion" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="Direccion" class="text-danger small"></span>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="RolId" class="form-label">Rol</label>
+                                    <select asp-for="RolId" class="form-select" asp-items="ViewBag.Roles">
+                                        <option value="">-- Seleccione un rol --</option>
+                                    </select>
+                                    <span asp-validation-for="RolId" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="ConfirmPassword" class="form-label">Confirmar Contraseña</label>
+                                    <input type="password" asp-for="ConfirmPassword" class="form-control" />
+                                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Password" class="form-label">Contraseña</label>
+                                    <div class="input-group">
+                                        <input type="password" asp-for="Password" class="form-control" id="contrasena" name="Password" required />
+                                        <button class="btn btn-outline-secondary" type="button" id="generarContrasena">
+                                            <i class="fas fa-key"></i> Generar
+                                        </button>
+                                    </div>
+                                    <small class="form-text text-muted">Mínimo 6 caracteres</small>
+                                    <div id="passwordStrength" class="mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            // Generar contraseña aleatoria
+            $('#generarContrasena').click(function() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%^&*()';
+                let password = '';
+                for (let i = 0; i < 12; i++) {
+                    password += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                $('#contrasena').val(password);
+                updatePasswordStrength(password);
+            });
+            
+            // Validar fortaleza de la contraseña
+            $('#contrasena').on('input', function() {
+                updatePasswordStrength($(this).val());
+            });
+            
+            function updatePasswordStrength(password) {
+                const strength = calculatePasswordStrength(password);
+                const $indicator = $('#passwordStrength');
+                
+                $indicator.removeClass('text-danger text-warning text-success');
+                
+                if (password.length === 0) {
+                    $indicator.text('');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    $indicator.addClass('text-danger').text('Muy débil (mínimo 6 caracteres)');
+                    return;
+                }
+                
+                if (strength < 2) {
+                    $indicator.addClass('text-danger').text('Débil');
+                } else if (strength < 4) {
+                    $indicator.addClass('text-warning').text('Moderada');
+                } else {
+                    $indicator.addClass('text-success').text('Fuerte');
+                }
+            }
+            
+            function calculatePasswordStrength(password) {
+                let strength = 0;
+                
+                // Longitud mínima
+                if (password.length >= 8) strength++;
+                
+                // Contiene mayúsculas
+                if (/[A-Z]/.test(password)) strength++;
+                
+                // Contiene números
+                if (/[0-9]/.test(password)) strength++;
+                
+                // Contiene caracteres especiales
+                if (/[^A-Za-z0-9]/.test(password)) strength++;
+                
+                return strength;
+            }
+        });
+    </script>
+}

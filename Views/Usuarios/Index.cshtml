@@ -1,0 +1,237 @@
+@using System.Linq
+@using TiendaApp.Models
+@using TiendaApp.Models.ViewModels
+@model List<TiendaApp.Models.ViewModels.UsuarioViewModel>
+
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+    ViewData["ActivePage"] = "Usuarios";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">@ViewData["Title"]</h1>
+        <a asp-action="Crear" class="btn btn-primary">
+            <i class="fas fa-user-plus me-2"></i>Nuevo Usuario
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header bg-light py-3">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="card-title mb-0">Lista de Usuarios Registrados</h5>
+                </div>
+                <div class="col-md-6">
+                    <form asp-action="Index" method="get" class="row g-2">
+                        <div class="col-md-7">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="filtro" value="@ViewData["FiltroActual"]" placeholder="Buscar usuarios...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="rol" class="form-select" onchange="this.form.submit()">
+                                <option value="">Todos los roles</option>
+                                @if (ViewBag.Roles is IEnumerable<Rol> roles)
+                                {
+                                    foreach (var rol in roles)
+                                    {
+                                        <option value="@rol.Nombre" selected='@(ViewData["RolActual"]?.ToString() == rol.Nombre)'>@rol.Nombre</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-1"></i> Buscar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Apellidos</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th class="text-center">Registro</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var usuario in Model)
+                            {
+                                <tr>
+                                    <td>@usuario.Nombre</td>
+                                    <td>@usuario.Apellidos</td>
+                                    <td>@usuario.Email</td>
+                                    <td>@(string.IsNullOrEmpty(usuario.Telefono) ? "N/A" : usuario.Telefono)</td>
+                                    <td>
+                                        @if (usuario.Rol != null && !string.IsNullOrEmpty(usuario.Rol.ToString()))
+                                        {
+                                            <span class="badge bg-primary">@usuario.Rol</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Sin rol</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (usuario.Email != null)
+                                        {
+                                            <span class="badge bg-success">Activo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning">Sin email</span>
+                                        }
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <small class="text-muted">@usuario.FechaRegistro.ToString("dd/MM/yyyy")</small>
+                                    </td>
+                                    <td class="text-end align-middle">
+                                        <a asp-action="Detalles" asp-route-id="@usuario.Id" class="btn btn-sm btn-outline-primary me-1" title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Editar" asp-route-id="@usuario.Id" class="btn btn-sm btn-outline-secondary me-1" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        @if (usuario.Id.ToString() != User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                                        {
+                                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="@usuario.Id" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-3">
+                    <div class="alert alert-info mb-0">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-info-circle fa-2x me-3"></i>
+                            <div>
+                                <h5 class="alert-heading">Resumen de usuarios</h5>
+                                @{
+                                    var totalUsuarios = 0;
+                                    var activos = 0;
+                                    var administradores = 0;
+                                    var inactivos = 0;
+                                    
+                                    foreach (var usuario in Model)
+                                    {
+                                        totalUsuarios++;
+                                        if (usuario.EstaActivo) activos++;
+                                        if (usuario.Rol != null && usuario.Rol.ToString() == "Administrador") administradores++;
+                                        if (!usuario.EstaActivo) inactivos++;
+                                    }
+                                }
+                                <p class="mb-0">
+                                    Total de usuarios: <strong>@totalUsuarios</strong> | 
+                                    Activos: <strong>@activos</strong> | 
+                                    Administradores: <strong>@administradores</strong> | 
+                                    Inactivos: <strong>@inactivos</strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-users-slash fa-4x text-muted mb-4"></i>
+                    <h4>No se encontraron usuarios</h4>
+                    <p class="text-muted mb-4">No hay usuarios que coincidan con los criterios de búsqueda.</p>
+                    <a asp-action="Index" class="btn btn-primary">
+                        <i class="fas fa-sync-alt me-2"></i>Mostrar todos
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer y se perderán todos los datos asociados.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="post">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Configurar el formulario de eliminación con el ID correcto
+        document.addEventListener('DOMContentLoaded', function() {
+            var deleteModal = document.getElementById('deleteModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var id = button.getAttribute('data-id');
+                var form = deleteModal.querySelector('form');
+                form.action = '/Usuarios/Delete/' + id;
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .avatar-initial {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+        
+        .table th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+        }
+    </style>
+}

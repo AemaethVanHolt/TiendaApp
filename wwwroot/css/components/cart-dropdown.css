@@ -1,0 +1,81 @@
+/* Estilos específicos para el dropdown del carrito */
+.cart-dropdown {
+    min-width: 350px !important;
+    padding: 0 !important;
+    background-color: rgba(0, 0, 0, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
+    z-index: 1040 !important; /* Mayor que el navbar pero menor que el footer */
+    position: relative;
+}
+
+.cart-dropdown .dropdown-header {
+    background-color: rgba(0, 0, 0, 0.9) !important;
+    color: #fff !important;
+    padding: 0.75rem 1rem !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.cart-dropdown .dropdown-item {
+    color: #fff !important;
+    padding: 0.75rem 1rem !important;
+    transition: background-color 0.2s ease !important;
+}
+
+.cart-dropdown .dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.cart-dropdown .dropdown-divider {
+    margin: 0 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.cart-dropdown .dropdown-footer {
+    padding: 0.75rem 1rem !important;
+    background-color: rgba(0, 0, 0, 0.9) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.cart-dropdown .dropdown-footer .btn {
+    width: 100%;
+}
+
+/* Estilos para cuando el carrito está vacío */
+.cart-dropdown .empty-cart {
+    padding: 1.5rem;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.cart-dropdown .empty-cart i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Asegurar que el texto sea blanco */
+.cart-dropdown,
+.cart-dropdown *,
+#cartDropdownItems,
+#cartDropdownItems * {
+    color: #fff !important;
+}
+
+/* Estilos para el contador del carrito */
+.cart-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #dc3545;
+    color: white !important;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}

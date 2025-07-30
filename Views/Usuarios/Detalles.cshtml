@@ -1,0 +1,352 @@
+@model TiendaApp.Models.ViewModels.UsuarioViewModel
+
+@{
+    ViewData["Title"] = "Detalles del Usuario";
+    ViewData["ActivePage"] = "Usuarios";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">@ViewData["Title"]</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a asp-action="Index">Usuarios</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Detalles</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-2"></i>Volver al listado
+            </a>
+            <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>Editar
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-body text-center">
+                    <div class="avatar-profile mb-3">
+                        <div class="avatar-initial bg-primary text-white">
+                            @Model.Nombre[0]@(Model.Apellidos?.Length > 0 ? Model.Apellidos[0] : ' ')
+                        </div>
+                    </div>
+                    <h4 class="mb-1">@Model.Nombre @Model.Apellidos</h4>
+                    <p class="text-muted mb-3">@Model.Rol</p>
+                    
+                    <div class="d-flex justify-content-center gap-2 mb-3">
+                        <span class="badge bg-success">
+                            <i class="fas fa-check-circle me-1"></i>Correo Verificado
+                        </span>
+                        
+                        @if (Model.Rol == "Administrador")
+                        {
+                            <span class="badge bg-primary">
+                                <i class="fas fa-shield-alt me-1"></i>Administrador
+                            </span>
+                        }
+                    </div>
+                    
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="mailto:@Model.Email" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                        @if (!string.IsNullOrEmpty(Model.Telefono))
+                        {
+                            <a href="tel:@Model.Telefono" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-phone"></i>
+                            </a>
+                        }
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="text-center small text-muted">
+                        Miembro desde @Model.FechaRegistro.ToString("dd/MM/yyyy")
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow mb-4">
+                <div class="card-header bg-light py-3">
+                    <h6 class="mb-0">Información de Contacto</h6>
+                </div>
+                <div class="card-body">
+                    <dl class="mb-0">
+                        <dt class="small text-muted mb-1">Correo Electrónico</dt>
+                        <dd class="mb-3">
+                            <a href="mailto:@Model.Email">@Model.Email</a>
+                        </dd>
+                        
+                        @if (!string.IsNullOrEmpty(Model.Telefono))
+                        {
+                            <dt class="small text-muted mb-1">Teléfono</dt>
+                            <dd class="mb-3">
+                                <a href="tel:@Model.Telefono">@Model.Telefono</a>
+                            </dd>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(Model.Direccion))
+                        {
+                            <dt class="small text-muted mb-1">Dirección</dt>
+                            <dd class="mb-0">@Model.Direccion</dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-light py-3">
+                    <ul class="nav nav-tabs card-header-tabs" id="userTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab" aria-controls="activity" aria-selected="true">
+                                <i class="fas fa-chart-line me-2"></i>Actividad
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="false">
+                                <i class="fas fa-info-circle me-2"></i>Detalles
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">
+                                <i class="fas fa-cog me-2"></i>Configuración
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="userTabsContent">
+                        <div class="tab-pane fade show active" id="activity" role="tabpanel" aria-labelledby="activity-tab">
+                            <div class="text-center py-5">
+                                <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                                <h5>Actividad del Usuario</h5>
+                                <p class="text-muted">Aquí se mostrará la actividad reciente del usuario.</p>
+                                
+                                <div class="mt-4">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Último inicio de sesión:</span>
+                                        <span class="fw-medium">
+                                            @(Model.UltimoAcceso.HasValue ? 
+                                                Model.UltimoAcceso.Value.ToString("dd/MM/yyyy HH:mm") : 
+                                                "Nunca")
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Estado de la cuenta:</span>
+                                        @if (Model.Activo)
+                                        {
+                                            <span class="badge bg-success">Activa</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Inactiva</span>
+                                        }
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted">Rol del sistema:</span>
+                                        <span class="fw-medium">@Model.Rol</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-pane fade" id="details" role="tabpanel" aria-labelledby="details-tab">
+                            <h6 class="mb-3">Información del Perfil</h6>
+                            <dl class="row">
+                                <dt class="col-sm-4">Nombre</dt>
+                                <dd class="col-sm-8">@Model.Nombre</dd>
+                                
+                                <dt class="col-sm-4">Apellidos</dt>
+                                <dd class="col-sm-8">@Model.Apellidos</dd>
+                                
+                                <dt class="col-sm-4">Correo Electrónico</dt>
+                                <dd class="col-sm-8">@Model.Email</dd>
+                                
+                                @if (!string.IsNullOrEmpty(Model.Telefono))
+                                {
+                                    <dt class="col-sm-4">Teléfono</dt>
+                                    <dd class="col-sm-8">@Model.Telefono</dd>
+                                }
+                                
+                                @if (!string.IsNullOrEmpty(Model.Direccion))
+                                {
+                                    <dt class="col-sm-4">Dirección</dt>
+                                    <dd class="col-sm-8">@Model.Direccion</dd>
+                                }
+                                
+                                <dt class="col-sm-4">Rol del Sistema</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-primary">@Model.Rol</span>
+                                </dd>
+                                
+                                <dt class="col-sm-4">Estado de la Cuenta</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.EstaActivo)
+                                    {
+                                        <span class="badge bg-success">Activa</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Inactiva</span>
+                                    }
+                                </dd>
+                                
+                                <dt class="col-sm-4">Fecha de Registro</dt>
+                                <dd class="col-sm-8">@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</dd>
+                                
+                                @if (Model.UltimoAcceso.HasValue)
+                                {
+                                    <dt class="col-sm-4">Último Acceso</dt>
+                                    <dd class="col-sm-8">@Model.UltimoAcceso.Value.ToString("dd/MM/yyyy HH:mm")</dd>
+                                }
+                            </dl>
+                        </div>
+                        
+                        <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                            <div class="alert alert-warning">
+                                <h6><i class="fas fa-exclamation-triangle me-2"></i>Configuración del Usuario</h6>
+                                <p class="mb-0">Aquí podrás configurar los permisos y preferencias del usuario.</p>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h6 class="mb-3">Opciones de la Cuenta</h6>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="accountActive" @(Model.Activo ? "checked" : "") disabled>
+                                    <label class="form-check-label" for="accountActive">
+                                        @(Model.Activo ? "Cuenta activa" : "Cuenta inactiva")
+                                    </label>
+                                </div>
+                                
+                                <hr>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Restablecer Contraseña</h6>
+                                        <p class="small text-muted mb-0">Enviar un enlace para restablecer la contraseña</p>
+                                    </div>
+                                    <button class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-key me-1"></i>Enviar Enlace
+                                    </button>
+                                </div>
+                                
+                                <hr>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1 text-danger">Eliminar Cuenta</h6>
+                                        <p class="small text-muted mb-0">Esta acción no se puede deshacer</p>
+                                    </div>
+                                    <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                        <i class="fas fa-trash-alt me-1"></i>Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex">
+                    <div class="me-3">
+                        <i class="fas fa-exclamation-circle fa-3x text-danger"></i>
+                    </div>
+                    <div>
+                        <h5>¿Estás seguro de que deseas eliminar esta cuenta?</h5>
+                        <p class="mb-0">
+                            Esta acción eliminará permanentemente la cuenta de <strong>@Model.NombreCompleto</strong> y todos sus datos asociados. 
+                            <span class="text-danger">Esta acción no se puede deshacer.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-2"></i>Eliminar Cuenta
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .avatar-profile {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1rem;
+        }
+        
+        .avatar-initial {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: #6c757d;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: #0d6efd;
+            border-bottom: 3px solid #0d6efd;
+            background: transparent;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            border-color: transparent;
+            color: #0d6efd;
+        }
+        
+        .card-header-tabs {
+            margin-bottom: -1.25rem;
+            border-bottom: none;
+        }
+        
+        .tab-content {
+            padding-top: 1.5rem;
+        }
+        
+        dt {
+            font-weight: 500;
+            color: #6c757d;
+        }
+        
+        dd {
+            margin-bottom: 1rem;
+        }
+    </style>
+}

@@ -1,0 +1,55 @@
+@model TiendaApp.Controllers.CambiarContrasenaViewModel
+
+@{
+    ViewData["Title"] = "Cambiar Contraseña";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4><i class="fas fa-key me-2"></i>@ViewData["Title"]</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CambiarContrasena" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="ContrasenaActual" class="form-label">Contraseña actual</label>
+                            <input asp-for="ContrasenaActual" type="password" class="form-control" />
+                            <span asp-validation-for="ContrasenaActual" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="NuevaContrasena" class="form-label">Nueva contraseña</label>
+                            <input asp-for="NuevaContrasena" type="password" class="form-control" />
+                            <span asp-validation-for="NuevaContrasena" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="ConfirmarContrasena" class="form-label">Confirmar nueva contraseña</label>
+                            <input asp-for="ConfirmarContrasena" type="password" class="form-control" />
+                            <span asp-validation-for="ConfirmarContrasena" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Cambiar Contraseña
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <a asp-action="Index" asp-controller="Home" class="text-decoration-none">
+                        <i class="fas fa-arrow-left me-1"></i>Volver al inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

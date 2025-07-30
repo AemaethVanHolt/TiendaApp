@@ -1,0 +1,42 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty;
+    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
+    var area = ViewContext.RouteData.Values["area"]?.ToString() ?? string.Empty;
+    
+    // Determinar el archivo CSS a cargar basado en el controlador y la acción
+    string? cssFile = null;
+    
+    // Estilos específicos para el área de administración
+    if (!string.IsNullOrEmpty(area) && area.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+    {
+        cssFile = $"~/css/views/administrador-{controller.ToLowerInvariant()}.css";
+    }
+    // Estilos específicos para controladores
+    else if (!string.IsNullOrEmpty(controller))
+    {
+        switch (controller.ToLower())
+        {
+            case "carrito":
+                cssFile = "~/css/views/carrito.css";
+                break;
+            case "productos":
+                if (action?.Equals("Index", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    cssFile = "~/css/views/productos.css";
+                }
+                break;
+            case "home":
+                if (action?.Equals("Index", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    cssFile = "~/css/views/home.css";
+                }
+                break;
+        }
+    }
+}
+
+@if (!string.IsNullOrEmpty(cssFile))
+{
+    <link rel="stylesheet" href="@Url.Content(cssFile)" asp-append-version="true" />
+}

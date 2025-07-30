@@ -1,0 +1,266 @@
+@using TiendaApp.Data
+@using Microsoft.AspNetCore.Antiforgery
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Claims
+@inject IAntiforgery Xsrf
+@inject TiendaContext _context
+@{
+    var token = Xsrf.GetAndStoreTokens(Context).RequestToken;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TiendaApp</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/TiendaApp.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/components/navbar.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/components/footer.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/components/cart-dropdown.css" asp-append-version="true" />
+    
+    <!-- Estilos específicos de la vista -->
+    <partial name="_ViewStyles" />
+    
+    <!-- Sección para estilos adicionales en vistas específicas -->
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <!-- Token anti-falsificación -->
+    <input type="hidden" id="RequestVerificationToken" name="__RequestVerificationToken" value="@token" />
+    
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+        <div class="container">
+            <!-- Logo -->
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <i class="fas fa-store me-2"></i>TiendaApp
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" 
+                    aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <!-- Menú principal -->
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="Index">
+                            <i class="fas fa-home me-1"></i> Inicio
+                        </a>
+                    </li>
+                    
+                    <!-- Menú desplegable de Productos -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="productosDropdown" role="button" 
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-box-open me-1"></i> Productos
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="productosDropdown">
+                            <li><a class="dropdown-item" href="/Productos">
+                                <i class="fas fa-th me-2"></i>Todos los productos
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Categorías</h6></li>
+                            @{
+                                var tipos = await _context.Productos
+                                    .Where(p => p.Activo)
+                                    .Select(p => p.Tipo)
+                                    .Distinct()
+                                    .OrderBy(t => t)
+                                    .ToListAsync();
+                                
+                                @if (tipos != null)
+                                {
+                                    foreach (var tipo in tipos)
+                                    {
+                                        if (!string.IsNullOrEmpty(tipo))
+                                        {
+                                            <li><a class="dropdown-item" href="/Productos?tipo=@Uri.EscapeDataString(tipo)">
+                                                @tipo
+                                            </a></li>
+                                        }
+                                    }
+                                }
+                            }
+                        </ul>
+                    </li>
+                </ul>
+                
+                <!-- Carrito y autenticación -->
+                <ul class="navbar-nav ms-auto">
+                    <!-- Carrito -->
+                    <li class="nav-item dropdown me-3">
+                        <a class="nav-link position-relative" href="#" id="cartDropdown" role="button" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-shopping-cart fs-5"></i>
+                            <span class="cart-count d-none" id="cart-count">0</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end cart-dropdown" style="min-width: 300px;" 
+                            aria-labelledby="cartDropdown">
+                            <div class="dropdown-header">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-shopping-cart me-2"></i>Mi Carrito
+                                </h6>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div id="cartDropdownItems" class="p-0">
+                                <div class="empty-cart">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <p class="mb-0">Tu carrito está vacío</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-footer">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0">Total:</h6>
+                                    <h5 class="mb-0" id="cartDropdownTotal">$0.00</h5>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <a href="/Carrito/VerCarrito" class="btn btn-primary">
+                                        <i class="fas fa-shopping-bag me-2"></i>Ver Carrito
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <!-- Inicio de sesión/Registro -->
+                    @if (User?.Identity?.IsAuthenticated == true)
+                    {
+                        var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+                        var userName = User.FindFirst(ClaimTypes.Name)?.Value;
+                        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+                        var displayName = !string.IsNullOrEmpty(userName) ? userName : userEmail;
+                        
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-1"></i> @displayName
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><span class="dropdown-header">@userEmail</span></li>
+                                @if (!string.IsNullOrEmpty(userRole))
+                                {
+                                    <li><span class="dropdown-header small text-muted">@userRole</span></li>
+                                }
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/Perfil"><i class="fas fa-user me-2"></i>Mi Perfil</a></li>
+                                
+                                @if (User.IsInRole("Administrador"))
+                                {
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/Productos/Admin"><i class="fas fa-box me-2"></i>Productos</a></li>
+                                    <li><a class="dropdown-item" href="/Ventas"><i class="fas fa-cash-register me-2"></i>Ventas</a></li>
+                                    <li><a class="dropdown-item" href="/Almacen"><i class="fas fa-warehouse me-2"></i>Almacén</a></li>
+                                    <li><a class="dropdown-item" href="/Usuarios"><i class="fas fa-users me-2"></i>Usuarios Registrados</a></li>
+                                }
+                                
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/Cuenta/CambiarContrasena"><i class="fas fa-key me-2"></i>Cambiar contraseña</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form class="form-inline" action="/Cuenta/CerrarSesion" method="post">
+                                        <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Cuenta/IniciarSesion">
+                                <i class="fas fa-sign-in-alt me-1"></i>Iniciar Sesión
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Cuenta/Registro">
+                                <i class="fas fa-user-plus me-1"></i>Registrarse
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+    <div class="main-content">
+        <div class="container">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <footer class="border-top footer text-muted mt-5">
+        <div class="container text-center">
+            &copy; @DateTime.Now.Year - Sistema de Gestión de Tienda - 
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Políticas de Privacidad</a>
+        </div>
+        <!-- Token anti-falsificación -->
+        @Html.AntiForgeryToken()
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Incluir el token de verificación para AJAX -->
+    @Html.AntiForgeryToken()
+    
+    <!-- El script del carrito se carga desde un archivo separado -->
+    <script src="~/js/cart-dropdown.js" asp-append-version="true"></script>
+    <script src="~/js/carrito.js" asp-append-version="true"></script>
+    <!-- Script para manejar el carrito cuando se jode -->
+    <script>
+        // Función para actualizar el contador del carrito
+        function updateCartCount() {
+            fetch('/Carrito/GetCount')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al obtener el conteo del carrito');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const cartCount = document.getElementById('cart-count');
+                    if (cartCount) {
+                        cartCount.textContent = data.count;
+                        cartCount.classList.toggle('d-none', data.count === 0);
+                        console.log('Contador del carrito actualizado:', data.count);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al actualizar el contador del carrito:', error);
+                    // Mostrar el error en la consola del navegador
+                    console.log('Detalles del error:', error.message);
+                });
+        }
+        
+        // Función para mostrar notificaciones
+        function showToast(message, type = 'info') {
+            // Crear el contenedor del toast si no existe
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.style.position = 'fixed';
+                toastContainer.style.top = '20px';
+                toastContainer.style.right = '20px';
+                toastContainer.style.zIndex = '9999';
+                document.body.appendChild(toastContainer);
+            }
+            
+            // Crear el toast
+            if (cartDropdown) {
+                cartDropdown.addEventListener('shown.bs.dropdown', function () {
+                    loadCartItems();
+                });
+            }
+        });
+
+        window.updateCartCount = updateCartCount;// Hacer la función accesible globalmente
+        window.showToast = showToast;
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,79 @@
+@model TiendaApp.Models.Producto
+
+@{
+    ViewData["Title"] = "Detalles del Producto";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Detalles del Producto</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    @if (!string.IsNullOrEmpty(Model.ImagenUrl))
+                    {
+                        <img src="@Model.ImagenUrl" class="img-fluid rounded" alt="@Model.Nombre" style="max-height: 300px; width: auto;">
+                    }
+                    else
+                    {
+                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 300px; width: 100%;">
+                            <i class="fas fa-box-open fa-5x text-muted"></i>
+                        </div>
+                    }
+                </div>
+                <div class="col-md-8">
+                    <dl class="row">
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Nombre)</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.Nombre)</dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Descripcion)</dt>
+                        <dd class="col-sm-9">@(string.IsNullOrEmpty(Model.Descripcion) ? "No hay descripción" : Model.Descripcion)</dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Precio)</dt>
+                        <dd class="col-sm-9">@Model.Precio.ToString("C")</dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Stock)</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge @(Model.Stock > 0 ? "bg-success" : "bg-danger")">
+                                @(Model.Stock > 0 ? $"{Model.Stock} en stock" : "Agotado")
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Tipo)</dt>
+                        <dd class="col-sm-9">@(string.IsNullOrEmpty(Model.Tipo) ? "No especificado" : Model.Tipo)</dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.EstaActivo)</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.EstaActivo)
+                            {
+                                <span class="badge bg-success">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactivo</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-light">
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Volver al listado
+                </a>
+                <div>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                        <i class="fas fa-edit me-1"></i> Editar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

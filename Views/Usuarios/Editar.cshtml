@@ -1,0 +1,361 @@
+@model TiendaApp.Models.ViewModels.UsuarioEditViewModel
+
+@{
+    ViewData["Title"] = "Editar Usuario";
+    ViewData["ActivePage"] = "Usuarios";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">@ViewData["Title"]</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a asp-action="Index">Usuarios</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Editar</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-2"></i>Volver al listado
+            </a>
+            <a asp-action="Detalles" asp-route-id="@Model.Id" class="btn btn-outline-primary">
+                <i class="fas fa-eye me-2"></i>Ver Detalles
+            </a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow">
+                <div class="card-header bg-light py-3">
+                    <h5 class="mb-0">Editar Información del Usuario</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Editar" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="ProfileImageUrl" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        
+                        <div class="row">
+                            <!-- Columna de imagen de perfil -->
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Imagen de Perfil</h6>
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <div class="profile-image-container mb-3">
+                                            @if (!string.IsNullOrEmpty(Model.ProfileImageUrl))
+                                            {
+                                                <img id="profileImagePreview" src="@Model.ProfileImageUrl" alt="Imagen de perfil" class="img-fluid rounded-circle border" style="width: 200px; height: 200px; object-fit: cover;">
+                                            }
+                                            else
+                                            {
+                                                <div id="profileImagePreview" class="rounded-circle border d-flex align-items-center justify-content-center bg-light" style="width: 200px; height: 200px; margin: 0 auto;">
+                                                    <i class="fas fa-user fa-5x text-secondary"></i>
+                                                </div>
+                                            }
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label asp-for="ProfileImage" class="form-label">Cambiar imagen</label>
+                                            <input type="file" class="form-control" asp-for="ProfileImage" accept="image/*" 
+                                                   onchange="document.getElementById('profileImagePreview').src = window.URL.createObjectURL(this.files[0]); document.getElementById('removeImageCheckbox').checked = false;">
+                                            <span asp-validation-for="ProfileImage" class="text-danger small"></span>
+                                        </div>
+                                        
+                                        @if (!string.IsNullOrEmpty(Model.ProfileImageUrl))
+                                        {
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="removeImageCheckbox" name="RemoveProfileImage" value="true">
+                                                <label class="form-check-label" for="removeImageCheckbox">
+                                                    Eliminar imagen actual
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Columna de datos del usuario -->
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label asp-for="Nombre" class="form-label"></label>
+                                            <input asp-for="Nombre" class="form-control" />
+                                            <span asp-validation-for="Nombre" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label asp-for="Apellidos" class="form-label"></label>
+                                            <input asp-for="Apellidos" class="form-control" />
+                                            <span asp-validation-for="Apellidos" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group mb-3">
+                                            <label asp-for="Direccion" class="form-label"></label>
+                                            <input asp-for="Direccion" class="form-control" />
+                                            <span asp-validation-for="Direccion" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label asp-for="Ciudad" class="form-label"></label>
+                                            <input asp-for="Ciudad" class="form-control" />
+                                            <span asp-validation-for="Ciudad" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label asp-for="Provincia" class="form-label"></label>
+                                            <input asp-for="Provincia" class="form-control" />
+                                            <span asp-validation-for="Provincia" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label asp-for="CodigoPostal" class="form-label"></label>
+                                            <input asp-for="CodigoPostal" class="form-control" />
+                                            <span asp-validation-for="CodigoPostal" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label asp-for="Email" class="form-label"></label>
+                                            <input asp-for="Email" class="form-control" />
+                                            <span asp-validation-for="Email" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label asp-for="Telefono" class="form-label"></label>
+                                            <input asp-for="Telefono" class="form-control" />
+                                            <span asp-validation-for="Telefono" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label asp-for="FechaNacimiento" class="form-label"></label>
+                                            <input asp-for="FechaNacimiento" class="form-control" type="date" />
+                                            <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label asp-for="RolSeleccionado" class="form-label"></label>
+                                            <select asp-for="RolSeleccionado" asp-items="ViewBag.Roles" class="form-select">
+                                                <option value="">Seleccionar rol...</option>
+                                            </select>
+                                            <span asp-validation-for="RolSeleccionado" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <div class="form-check form-switch mb-3">
+                                            <input class="form-check-input" type="checkbox" id="Activo" asp-for="Activo">
+                                            <label class="form-check-label" for="Activo">
+                                                @(Model.Activo ? "Cuenta activa" : "Cuenta inactiva")
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            <span>Para cambiar el estado de confirmación del correo, edite el perfil del usuario.</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <div class="alert alert-warning">
+                                            <div class="d-flex">
+                                                <div class="me-3">
+                                                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                                </div>
+                                                <div>
+                                                    <h6>¿Necesitas restablecer la contraseña?</h6>
+                                                    <p class="mb-0">
+                                                        Si el usuario ha olvidado su contraseña, puedes 
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">
+                                                            generar un enlace de restablecimiento
+                                                        </a> 
+                                                        que se le enviará por correo electrónico.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-between mt-3">
+                                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                                <i class="fas fa-times me-2"></i>Cancelar
+                                            </a>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save me-2"></i>Guardar Cambios
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para restablecer contraseña -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="resetPasswordModalLabel">
+                    <i class="fas fa-key me-2"></i>Restablecer Contraseña
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Deseas generar y enviar un enlace de restablecimiento de contraseña a <strong>@Model.Email</strong>?</p>
+                <p class="mb-0">El usuario recibirá un correo con instrucciones para establecer una nueva contraseña.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-warning" id="confirmResetPassword">
+                    <i class="fas fa-paper-plane me-2"></i>Enviar Enlace
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cambiar texto del switch de estado
+            const statusSwitch = document.getElementById('EstaActivo');
+            if (statusSwitch) {
+                const statusLabel = statusSwitch.nextElementSibling;
+                
+                statusSwitch.addEventListener('change', function() {
+                    statusLabel.textContent = this.checked ? 'Cuenta activa' : 'Cuenta inactiva';
+                });
+            }
+            
+            // Manejar el envío del formulario de restablecimiento de contraseña
+            const confirmResetBtn = document.getElementById('confirmResetPassword');
+            if (confirmResetBtn) {
+                confirmResetBtn.addEventListener('click', function() {
+                    // Aquí iría la lógica para enviar el correo de restablecimiento
+                    // Por ahora, mostramos un mensaje de éxito
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('resetPasswordModal'));
+                    modal.hide();
+                    
+                    // Mostrar notificación de éxito
+                    showAlert('success', '¡Listo!', 'Se ha enviado un enlace de restablecimiento al correo del usuario.');
+                });
+            }
+            
+            // Función para mostrar notificaciones
+            function showAlert(type, title, message) {
+                const alertHtml = `
+                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+                            <div>
+                                <strong>${title}</strong>
+                                <div class="small">${message}</div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                
+                // Insertar la alerta al principio del contenedor principal
+                const container = document.querySelector('.container-fluid');
+                container.insertAdjacentHTML('afterbegin', alertHtml);
+                
+                // Eliminar la alerta después de 5 segundos
+                setTimeout(() => {
+                    const alert = document.querySelector('.alert');
+                    if (alert) {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }
+                }, 5000);
+            }
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .form-control, .form-select {
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .btn-outline-secondary {
+            border-color: #dee2e6;
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .alert {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .alert i {
+            font-size: 1.25rem;
+        }
+        
+        .form-check-input:checked {
+            background-color: #198754;
+            border-color: #198754;
+        }
+        
+        .form-switch .form-check-input {
+            width: 2.5em;
+            margin-left: -2.5em;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25%29'/%3e%3c/svg%3e");
+            background-position: left center;
+            border-radius: 2em;
+            transition: background-position 0.15s ease-in-out;
+        }
+        
+        .form-switch .form-check-input:checked {
+            background-position: right center;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+        }
+    </style>
+}

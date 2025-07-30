@@ -1,0 +1,90 @@
+/* Estilos específicos para el carrito de compras */
+
+/* Dropdown del carrito */
+.dropdown-menu.cart-dropdown {
+    min-width: 320px;
+    padding: 0;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-item-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+.cart-item-details {
+    flex: 1;
+}
+
+.cart-item-title {
+    font-size: 0.9rem;
+    margin: 0 0 5px 0;
+    font-weight: 500;
+}
+
+.cart-item-price {
+    font-weight: bold;
+    color: #0d6efd;
+}
+
+/* Tabla del carrito */
+.table-cart {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+}
+
+.table-cart th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    background-color: #f8f9fa;
+    padding: 0.75rem;
+}
+
+.table-cart td {
+    vertical-align: middle;
+    padding: 1rem 0.75rem;
+}
+
+.quantity-input {
+    max-width: 70px;
+    text-align: center;
+}
+
+/* Total del carrito */
+.cart-total {
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: right;
+    margin-top: 1rem;
+}
+
+/* Botones del carrito */
+.btn-cart-action {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Estado del carrito vacío */
+.cart-empty {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+}
+
+.cart-empty i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #dee2e6;
+}

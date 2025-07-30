@@ -1,0 +1,414 @@
+@model IEnumerable<TiendaApp.Models.Producto>
+
+@{
+    ViewData["Title"] = "Tienda en Línea";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 mb-3">Bienvenido a Nuestra Tienda</h1>
+        <p class="lead text-muted">Descubre nuestros productos más recientes</p>
+        <div class="alert alert-info mt-4">
+            <strong>Usuario actual:</strong> @ViewBag.UsuarioActual <br />
+            <strong>Rol:</strong> @ViewBag.MensajeRol
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var producto in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    @if (!string.IsNullOrEmpty(producto.ImagenUrl))
+                    {
+                        <div class="card-img-container" style="height: 200px; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                        <img src="@producto.ImagenUrl" alt="@producto.Nombre" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                    </div>
+                    }
+                    else
+                    {
+                        <div class="bg-light text-center p-5" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-image fa-4x text-muted"></i>
+                        </div>
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@producto.Nombre</h5>
+                        <p class="card-text text-muted">@(producto.Descripcion?.Length > 100 ? producto.Descripcion.Substring(0, 100) + "..." : producto.Descripcion)</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="h5 mb-0 text-primary">@producto.Precio.ToString("C")</span>
+                            <span class="badge bg-success">@producto.Stock disponibles</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <div class="d-grid gap-2">
+                            <div class="btn-group" role="group" aria-label="Acciones del producto">
+                                <a asp-controller="Productos" asp-action="Details" asp-route-id="@producto.Id" 
+                                    class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i> Detalles
+                                </a>
+                                <form method="post" asp-controller="Carrito" asp-action="AgregarAlCarrito" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="productoId" value="@producto.Id" />
+                                    <input type="hidden" name="cantidad" value="1" />
+                                    <button type="submit" class="btn btn-primary btn-sm" 
+                                            data-bs-toggle="tooltip" title="Añadir al carrito"
+                                            @(producto.Stock <= 0 ? "disabled" : "")>
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="text-center mt-5">
+        <a asp-controller="Productos" asp-action="Index" class="btn btn-outline-primary">
+            <i class="fas fa-store me-2"></i>Ver todos los productos
+        </a>
+    </div>
+</div>
+
+<!-- Modal del Carrito -->
+<div class="modal fade" id="cartModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-shopping-cart me-2"></i>Mi Carrito
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="cartItems">
+                <!-- Los elementos del carrito se cargarán aquí dinámicamente -->
+                <div class="text-center py-4">
+                    <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Tu carrito está vacío</p>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Seguir comprando</button>
+                <div>
+                    <span class="me-3">Total: <strong id="cartTotal">$0.00</strong></span>
+                    <button type="button" class="btn btn-success" id="checkoutBtn" disabled>
+                        <i class="fas fa-credit-card me-2"></i>Pagar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Función para actualizar el contador del carrito
+        function updateCartCount() {
+            fetch('/Carrito/GetCount')
+                .then(response => response.json())
+                .then(data => {
+                    const cartCount = document.getElementById('cart-count');
+                    if (cartCount) {
+                        cartCount.textContent = data.count;
+                        cartCount.classList.toggle('d-none', data.count === 0);
+                    }
+                    // Actualizar el botón de pago
+                    const checkoutBtn = document.getElementById('checkoutBtn');
+                    if (checkoutBtn) {
+                        checkoutBtn.disabled = data.count === 0;
+                    }
+                });
+        }
+        
+        // Función para cargar los ítems del carrito en el modal
+        function loadCartModal() {
+            fetch('/Carrito/GetCartItems')
+                .then(response => response.json())
+                .then(data => {
+                    const cartItemsContainer = document.getElementById('cartItems');
+                    const cartTotalElement = document.getElementById('cartTotal');
+                    
+                    if (data.success && data.items && data.items.length > 0) {
+                        let itemsHtml = `
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th class="text-center">Cantidad</th>
+                                            <th class="text-end">Precio</th>
+                                            <th class="text-end">Subtotal</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+                        
+                        data.items.forEach(item => {
+                            const itemTotal = item.precio * item.cantidad;
+                            itemsHtml += `
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="${item.imagenUrl || '/images/default-product.png'}" 
+                                                 alt="${item.nombre}" 
+                                                 class="img-fluid rounded me-2" 
+                                                 style="width: 50px; height: 50px; object-fit: cover;">
+                                            <div>
+                                                <h6 class="mb-0" style="font-size: 0.9rem;">${item.nombre}</h6>
+                                                <small class="text-muted">$${item.precio.toFixed(2)} c/u</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="input-group input-group-sm" style="width: 100px;">
+                                            <button class="btn btn-outline-secondary btn-update-quantity" 
+                                                    type="button" 
+                                                    data-product-id="${item.id}"
+                                                    data-action="decrease">-</button>
+                                            <input type="number" 
+                                                   class="form-control text-center" 
+                                                   value="${item.cantidad}" 
+                                                   min="1" 
+                                                   data-product-id="${item.id}">
+                                            <button class="btn btn-outline-secondary btn-update-quantity" 
+                                                    type="button" 
+                                                    data-product-id="${item.id}"
+                                                    data-action="increase">+</button>
+                                        </div>
+                                    </td>
+                                    <td class="text-end">$${item.precio.toFixed(2)}</td>
+                                    <td class="text-end">$${itemTotal.toFixed(2)}</td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-danger btn-remove-item" 
+                                                data-product-id="${item.id}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        
+                        itemsHtml += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                        
+                        cartItemsContainer.innerHTML = itemsHtml;
+                        cartTotalElement.textContent = `$${data.total.toFixed(2)}`;
+                        
+                        // Agregar manejadores de eventos para los botones de actualizar cantidad
+                        document.querySelectorAll('.btn-update-quantity').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const productId = this.getAttribute('data-product-id');
+                                const action = this.getAttribute('data-action');
+                                const input = this.closest('.input-group').querySelector('input');
+                                let quantity = parseInt(input.value);
+                                
+                                if (action === 'increase') {
+                                    quantity++;
+                                } else if (action === 'decrease' && quantity > 1) {
+                                    quantity--;
+                                }
+                                
+                                updateCartItemQuantity(productId, quantity);
+                            });
+                        });
+                        
+                        // Agregar manejadores para cambios directos en el input
+                        document.querySelectorAll('.input-group input').forEach(input => {
+                            input.addEventListener('change', function() {
+                                const productId = this.getAttribute('data-product-id');
+                                const quantity = parseInt(this.value) || 1;
+                                updateCartItemQuantity(productId, quantity);
+                            });
+                        });
+                        
+                        // Agregar manejadores para los botones de eliminar
+                        document.querySelectorAll('.btn-remove-item').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const productId = this.getAttribute('data-product-id');
+                                if (confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) {
+                                    removeFromCart(productId);
+                                }
+                            });
+                        });
+                        
+                    } else {
+                        cartItemsContainer.innerHTML = `
+                            <div class="text-center py-4">
+                                <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">Tu carrito está vacío</p>
+                            </div>
+                        `;
+                        cartTotalElement.textContent = '$0.00';
+                        document.getElementById('checkoutBtn').disabled = true;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar el carrito:', error);
+                    const cartItemsContainer = document.getElementById('cartItems');
+                    cartItemsContainer.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Error al cargar el carrito. Por favor, intente nuevamente.
+                        </div>
+                    `;
+                });
+        }
+        
+        // Función para actualizar la cantidad de un ítem en el carrito
+        function updateCartItemQuantity(productId, quantity) {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            
+            fetch('/Carrito/ActualizarCantidad', {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    productoId: parseInt(productId),
+                    cantidad: parseInt(quantity)
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Recargar el carrito
+                    loadCartModal();
+                    // Actualizar el contador
+                    updateCartCount();
+                    // Mostrar notificación
+                    showToast('Cantidad actualizada', 'success');
+                } else {
+                    showToast(data.message || 'Error al actualizar la cantidad', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error al actualizar la cantidad:', error);
+                showToast('Error al actualizar la cantidad', 'danger');
+            });
+        }
+        
+        // Función para eliminar un ítem del carrito
+        function removeFromCart(productId) {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            
+            fetch(`/Carrito/EliminarDelCarrito?productoId=${productId}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Recargar el carrito
+                    loadCartModal();
+                    // Actualizar el contador
+                    updateCartCount();
+                    // Mostrar notificación
+                    showToast('Producto eliminado del carrito', 'success');
+                } else {
+                    showToast('Error al eliminar el producto', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error al eliminar el producto:', error);
+                showToast('Error al eliminar el producto', 'danger');
+            });
+        }
+
+        // Función para mostrar notificaciones toast
+        function showToast(message, type = 'info') {
+            // Crear el contenedor del toast si no existe
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.style.position = 'fixed';
+                toastContainer.style.top = '20px';
+                toastContainer.style.right = '20px';
+                toastContainer.style.zIndex = '9999';
+                document.body.appendChild(toastContainer);
+            }
+            
+            // Crear el toast
+            const toast = document.createElement('div');
+            toast.className = `toast show align-items-center text-white bg-${type} border-0`;
+            toast.role = 'alert';
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            // Contenido del toast
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+            
+            // Agregar el toast al contenedor
+            toastContainer.appendChild(toast);
+            
+            // Eliminar el toast después de 3 segundos
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Inicializar tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            // Actualizar el contador del carrito al cargar la página
+            updateCartCount();
+            
+            // Configurar tooltips de Bootstrap
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Cargar el carrito cuando se muestre el modal
+            const cartModal = document.getElementById('cartModal');
+            if (cartModal) {
+                cartModal.addEventListener('shown.bs.modal', function () {
+                    loadCartModal();
+                });
+                
+                // También cargar el carrito cuando se haga clic en el botón del carrito
+                const cartButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#cartModal"]');
+                cartButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        // Pequeño retraso para asegurar que el modal esté completamente mostrado
+                        setTimeout(loadCartModal, 300);
+                    });
+                });
+            }
+
+            // Mostrar mensajes del servidor
+            @{
+                var successMessage = TempData["SuccessMessage"] as string;
+                var errorMessage = TempData["ErrorMessage"] as string;
+            }
+            
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <text>showToast('@Html.Raw(successMessage)', 'success');</text>
+            }
+            
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <text>showToast('@Html.Raw(errorMessage)', 'danger');</text>
+            }
+        });
+    </script>
+}

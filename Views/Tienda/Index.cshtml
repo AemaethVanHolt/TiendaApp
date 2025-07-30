@@ -1,0 +1,214 @@
+@model IEnumerable<TiendaApp.Models.Producto>
+
+@{
+    ViewData["Title"] = "Nuestra Tienda";
+}
+
+@{
+    var successMessage = TempData["SuccessMessage"] as string;
+    var errorMessage = TempData["ErrorMessage"] as string;
+}
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @successMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @errorMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">@ViewData["Title"]</h1>
+    
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col">
+                <div class="card h-100">
+                    @if (!string.IsNullOrEmpty(item.ImagenUrl))
+                    {
+                        <img src="@item.ImagenUrl" class="card-img-top" alt="@item.Nombre" style="height: 200px; object-fit: cover;">
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@Html.DisplayFor(modelItem => item.Nombre)</h5>
+                        <p class="card-text">@Html.DisplayFor(modelItem => item.Descripcion)</p>
+                        <p class="h5 text-primary">@Html.DisplayFor(modelItem => item.Precio) €</p>
+                        @if (item.Stock > 0)
+                        {
+                            <span class="badge bg-success">En stock: @item.Stock</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Agotado</span>
+                        }
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary">Ver detalles</a>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <form method="post" asp-controller="Carrito" asp-action="AgregarAlCarrito" class="add-to-cart-form d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="productoId" value="@item.Id" />
+                                <input type="hidden" name="cantidad" value="1" />
+                                <button type="submit" class="btn btn-outline-success" data-bs-toggle="tooltip" title="Añadir al carrito">
+                                    <i class="fas fa-shopping-cart"></i> Añadir al carrito
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a href="/Identity/Account/Login" class="btn btn-outline-secondary">Inicia sesión para comprar</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Función para actualizar el contador del carrito
+        function updateCartCount() {
+            fetch('/Carrito/GetCount')
+                .then(response => response.json())
+                .then(data => {
+                    const cartCount = document.getElementById('cart-count');
+                    if (cartCount) {
+                        cartCount.textContent = data.count;
+                        cartCount.classList.toggle('d-none', data.count === 0);
+                    }
+                });
+        }
+
+        // Función para mostrar notificaciones toast
+        function showToast(message, type = 'info') {
+            // Crear el contenedor del toast si no existe
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.style.position = 'fixed';
+                toastContainer.style.top = '20px';
+                toastContainer.style.right = '20px';
+                toastContainer.style.zIndex = '9999';
+                document.body.appendChild(toastContainer);
+            }
+            
+            // Crear el toast
+            const toast = document.createElement('div');
+            toast.className = `toast show align-items-center text-white bg-${type} border-0`;
+            toast.role = 'alert';
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            // Contenido del toast
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+            
+            // Agregar el toast al contenedor
+            toastContainer.appendChild(toast);
+            
+            // Eliminar el toast después de 3 segundos
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+        
+        // Manejar el envío del formulario de añadir al carrito
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página cargada, configurando eventos...');
+            
+            // Actualizar el contador del carrito al cargar la página
+            updateCartCount();
+            
+            // Configurar el tooltip de Bootstrap
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Manejar el envío de los formularios de añadir al carrito
+            document.querySelectorAll('.add-to-cart-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(form);
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    const originalText = submitButton.innerHTML;
+                    
+                    // Mostrar indicador de carga
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Agregando...';
+                    
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'RequestVerificationToken': form.querySelector('input[name="__RequestVerificationToken"]').value,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Actualizar el contador del carrito
+                            const cartCount = document.getElementById('cart-count');
+                            if (cartCount) {
+                                cartCount.textContent = data.totalItems;
+                                cartCount.classList.remove('d-none');
+                            }
+                            
+                            // Mostrar mensaje de éxito
+                            showToast(data.message, 'success');
+                        } else {
+                            // Mostrar mensaje de error
+                            showToast(data.message || 'Error al agregar al carrito', 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('Error en la conexión. Intente nuevamente.', 'danger');
+                    })
+                    .finally(() => {
+                        // Restaurar el botón
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = originalText;
+                    });
+                });
+            });
+            
+            // Mostrar mensajes del servidor
+            @if (TempData["SuccessMessage"] is string successMessage)
+            {
+                <text>showToast('@Html.Raw(successMessage)', 'success');</text>
+            }
+            
+            @if (TempData["ErrorMessage"] is string errorMessage)
+            {
+                <text>showToast('@Html.Raw(errorMessage)', 'danger');</text>
+            }
+        });
+        
+        // Hacer las funciones accesibles globalmente
+        window.updateCartCount = updateCartCount;
+        window.showToast = showToast;
+    </script>
+}
