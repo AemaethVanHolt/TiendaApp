@@ -5,9 +5,9 @@ namespace TiendaApp.Models
 {
     public class Pedido
     {
-        public int Id { get; set; }
-        public int UsuarioId { get; set; }
-        public required Usuario Usuario { get; set; }
+        public int Id { get; set; } // Identificador del pedido en cuestión
+        public int UsuarioId { get; set; } // Muestra el usuario que ha realizado el pedido buscado por el ID
+        public required Usuario Usuario { get; set; } // Esto permite al usuario navegar por el pedido apra gestionar
         
         [Display(Name = "Fecha del pedido")]
         public DateTime FechaPedido { get; set; } = DateTime.UtcNow;
@@ -19,7 +19,7 @@ namespace TiendaApp.Models
         [StringLength(20, ErrorMessage = "El estado no puede exceder los 20 caracteres")]
         public string Estado { get; set; } = "Pendiente"; // Pendiente, Procesando, Enviado, Entregado, Cancelado
         
-        [Required(ErrorMessage = "La dirección de envío es obligatoria")]
+        [Required(ErrorMessage = "La dirección de envío es obligatoria")] // Está obligatorio pero lo voy a quitar en producción porque no lo uso
         [StringLength(200, ErrorMessage = "La dirección no puede exceder los 200 caracteres")]
         [Display(Name = "Dirección de envío")]
         public required string DireccionEnvio { get; set; }

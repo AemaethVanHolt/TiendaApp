@@ -39,12 +39,9 @@ namespace TiendaApp.Models
         [Display(Name = "Última modificación")]
         public DateTime FechaModificacion { get; set; } = DateTime.UtcNow;
 
-        // Propiedades de navegación (temporalmente eliminadas para resolver problemas de migración)
-        // public ICollection<DetallePedido> DetallesPedido { get; set; } = new List<DetallePedido>();
-
         // Propiedad calculada para compatibilidad
         [NotMapped]
-        public string? UrlImagen 
+        public string? UrlImagen // Esto es para introducir la imagen del producto
         { 
             get => ImagenUrl;
             set => ImagenUrl = value;

@@ -36,27 +36,27 @@ namespace TiendaApp.Models.ViewModels
         public string? CodigoPostal { get; set; }
         
         [Display(Name = "Fecha de Nacimiento")]
-        [DataType(DataType.Date)]
-        public DateTime? FechaNacimiento { get; set; }
-        
+        [DataType(DataType.Date)] // Esto es para mostrar un selector de fecha
+        public DateTime? FechaNacimiento { get; set; } // Fecha de nacimiento del usuario
+
         [Display(Name = "Imagen de perfil")]
-        public string? ProfileImageUrl { get; set; }
-        
+        public string? ProfileImageUrl { get; set; } // URL de la imagen de perfil del usuario
+
         [Display(Name = "Rol")]
-        public string Rol { get; set; } = string.Empty;
-        
+        public string Rol { get; set; } = string.Empty; // Rol del usuario, por ejemplo "Cliente", "Administrador", etc.
+
         [Display(Name = "Cuenta activa")]
-        public bool Activo { get; set; }
-        
+        public bool Activo { get; set; } // Indica si la cuenta del usuario está activa o no
+
         // Propiedad para compatibilidad con la vista
-        public bool EstaActivo { get => Activo; set => Activo = value; }
-        
+        public bool EstaActivo { get => Activo; set => Activo = value; } // Esta propiedad se usa para mantener la compatibilidad con las vistas que esperan una propiedad llamada "EstaActivo"
+
         [Display(Name = "Fecha de registro")]
         [DataType(DataType.DateTime)]
-        public DateTime FechaRegistro { get; set; }
-        
+        public DateTime FechaRegistro { get; set; } // Fecha en que el usuario se registró en la aplicación
+
         [Display(Name = "Último acceso")]
         [DataType(DataType.DateTime)]
-        public DateTime? UltimoAcceso { get; set; }
+        public DateTime? UltimoAcceso { get; set; } // Fecha del último acceso del usuario a la aplicación, puede ser nula si nunca ha accedido
     }
 }

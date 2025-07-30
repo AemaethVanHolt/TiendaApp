@@ -2,12 +2,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TiendaApp.Models.ViewModels
 {
-    public class MetodoPagoViewModel
+    public class MetodoPagoViewModel // Este modelo se utiliza para representar los detalles del método de pago en el proceso de compra
     {
         // Propiedad para el total
         public decimal Total { get; set; }
         
-        // Métodos de pago disponibles
+        // Métodos de pago disponibles QUE NO ESTÁN FUNCIONALES PORQUE EL PAGO SE HACE AUTOMÁTICAMENTE Y QUEDA PENDIENTE
         public const string MetodoTarjeta = "Tarjeta";
         public const string MetodoTransferencia = "Transferencia";
         public const string MetodoPaypal = "PayPal";
@@ -32,7 +32,7 @@ namespace TiendaApp.Models.ViewModels
         public string? NumeroTarjeta { get; set; }
         
         [Display(Name = "Vencimiento (MM/YY)")]
-        [RegularExpression(@"^(0[1-9]|1[0-2])\/?([0-9]{2})$", ErrorMessage = "Formato inválido. Use MM/YY")]
+        [RegularExpression(@"^(0[1-9]|1[0-2])\/?([0-9]{2})$", ErrorMessage = "Formato inválido. Use MM/YY")] // Formato MM/YY
         [RequiredIf("MetodoPagoSeleccionado", MetodoTarjeta, ErrorMessage = "La fecha de vencimiento es obligatoria")]
         public string? FechaVencimiento { get; set; }
         
@@ -41,7 +41,7 @@ namespace TiendaApp.Models.ViewModels
         [RequiredIf("MetodoPagoSeleccionado", MetodoTarjeta, ErrorMessage = "El CVV es obligatorio")]
         public string? Cvv { get; set; }
         
-        // Propiedades para transferencia
+        // Propiedades para transferencia bancaria
         [Display(Name = "Número de cuenta")]
         [RequiredIf("MetodoPagoSeleccionado", MetodoTransferencia, ErrorMessage = "El número de cuenta es obligatorio")]
         public string? NumeroCuenta { get; set; }
@@ -57,8 +57,8 @@ namespace TiendaApp.Models.ViewModels
         [Phone(ErrorMessage = "Número de teléfono no válido")]
         [RequiredIf("MetodoPagoSeleccionado", MetodoBizum, ErrorMessage = "El teléfono para Bizum es obligatorio")]
         public string? TelefonoBizum { get; set; }
-        
-        // Propiedades para contra reembolso
+
+        // Propiedades para contra reembolso. ESTO PAGA AUTOMÁTICAMENTE AL RECOGER EL PEDIDO
         [Display(Name = "Acepto los términos y condiciones")]
         [Range(typeof(bool), "true", "true", ErrorMessage = "Debe aceptar los términos y condiciones")]
         public bool AceptaTerminos { get; set; }

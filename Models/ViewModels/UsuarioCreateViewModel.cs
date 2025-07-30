@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace TiendaApp.Models.ViewModels
 {
-    public class UsuarioCreateViewModel
+    public class UsuarioCreateViewModel // Este modelo se utiliza para crear un nuevo usuario en la aplicación
     {
         [Required(ErrorMessage = "El nombre es obligatorio")]
         [Display(Name = "Nombre")]

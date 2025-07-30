@@ -3,18 +3,18 @@ using Microsoft.AspNetCore.Http;
 
 namespace TiendaApp.Models.ViewModels
 {
-    public class UsuarioEditViewModel
+    public class UsuarioEditViewModel // Este modelo se utiliza para editar un usuario existente en la aplicación
     {
-        public string Id { get; set; } = string.Empty;
-        
+        public string Id { get; set; } = string.Empty; // Identificador único del usuario
+
         [Required(ErrorMessage = "El nombre es obligatorio")]
         [Display(Name = "Nombre")]
-        public string Nombre { get; set; } = string.Empty;
-        
+        public string Nombre { get; set; } = string.Empty; // Nombre del usuario
+
         [Required(ErrorMessage = "Los apellidos son obligatorios")]
         [Display(Name = "Apellidos")]
-        public string Apellidos { get; set; } = string.Empty;
-        
+        public string Apellidos { get; set; } = string.Empty; // Apellidos del usuario
+
         [Required(ErrorMessage = "El correo electrónico es obligatorio")]
         [EmailAddress(ErrorMessage = "El correo electrónico no es válido")]
         [Display(Name = "Correo electrónico")]
@@ -40,13 +40,13 @@ namespace TiendaApp.Models.ViewModels
         public DateTime? FechaNacimiento { get; set; }
         
         [Display(Name = "Imagen de perfil")]
-        public IFormFile? ProfileImage { get; set; }
-        
+        public IFormFile? ProfileImage { get; set; } // Archivo de imagen de perfil que se subirá
+
         [Display(Name = "URL de la imagen de perfil")]
-        public string? ProfileImageUrl { get; set; }
-        
+        public string? ProfileImageUrl { get; set; } // URL de la imagen de perfil actual
+
         [Display(Name = "Rol")]
-        public string? RolSeleccionado { get; set; }
+        public string? RolSeleccionado { get; set; } //Roles que puede atribuir solo el ADMINISTRADOR al usuario
         
         [Display(Name = "Cuenta activa")]
         public bool Activo { get; set; }
