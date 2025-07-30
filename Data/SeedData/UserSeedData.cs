@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Security.Cryptography;
 using System.Text;
 using TiendaApp.Models;
 
@@ -171,13 +170,6 @@ namespace TiendaApp.Data.SeedData
                     throw;
                 }
             }
-        }
-
-        private static string ComputeSha256Hash(string rawData)  
-        {  
-            // Para depuración: devolvemos la contraseña en texto plano
-            Console.WriteLine($"[DEBUG] Contraseña para {rawData}: {rawData}");
-            return rawData;
         }
     }
 }

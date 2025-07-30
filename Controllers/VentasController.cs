@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using TiendaApp.Data;
 using TiendaApp.Models;
+using TiendaApp.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,7 +64,22 @@ namespace TiendaApp.Controllers
                 return NotFound();
             }
 
-            return View(venta);
+            // Crear el ViewModel
+            var viewModel = new VentaDetalleViewModel
+            {
+                Venta = venta,
+                Detalles = venta.DetallesVenta.Select(dv => new DetalleVentaItem
+                {
+                    ProductoId = dv.ProductoId,
+                    ProductoNombre = dv.Producto?.Nombre ?? "Producto no disponible",
+                    Producto = dv.Producto,
+                    ImagenUrl = dv.Producto?.ImagenUrl,
+                    PrecioUnitario = dv.PrecioUnitario,
+                    Cantidad = dv.Cantidad
+                }).ToList()
+            };
+
+            return View(viewModel);
         }
 
         public async Task<IActionResult> Reporte()
