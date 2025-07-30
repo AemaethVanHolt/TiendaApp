@@ -1,26 +1,27 @@
 @{
-    ViewData["Title"] = "Configuración de Administrador";
+    ViewData["Title"] = "Configuración de Administrador"; // Título de la página para la configuración del administrador
     Layout = "_Layout";
 }
 
 <div class="container mt-5">
+    <!-- Contenedor principal con margen superior -->
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h2 class="text-center">Configuración de Administrador</h2>
+                    <h2 class="text-center">Configuración de Administrador</h2> <!-- Encabezado de la tarjeta -->
                 </div>
                 <div class="card-body">
                     <div class="alert alert-info">
                         <h4 class="alert-heading">Estado de la configuración:</h4>
-                        <p>@ViewBag.Message</p>
+                        <p>@ViewBag.Message</p> <!-- Mensaje de estado de la configuración -->
                     </div>
                     
                     <div class="mt-4">
                         <h5>¿Qué hacer a continuación?</h5>
                         <ul>
-                            <li><a href="/Usuarios">Ir al listado de usuarios</a></li>
-                            <li><a href="/">Volver al inicio</a></li>
+                            <li><a href="/Usuarios">Ir al listado de usuarios</a></li> <!-- Enlace al listado de usuarios -->
+                            <li><a href="/">Volver al inicio</a></li> <!-- Enlace para volver al inicio -->
                         </ul>
                     </div>
                 </div>
