@@ -61,9 +61,16 @@ namespace TiendaApp.Controllers
                 _logger.LogInformation("Contraseña almacenada: {Password}", usuario.Password);
                 _logger.LogInformation("Contraseña ingresada: {Password}", model.Password);
                 
-                var isPasswordValid = PasswordHelper.VerifyPassword(model.Password, usuario.Password);
-                _logger.LogInformation("¿Contraseña válida? {IsValid}", isPasswordValid);
-                _logger.LogInformation("¿Usuario activo? {Activo}", usuario.EstaActivo);
+                // Verificación con contraseña en texto plano
+                _logger.LogInformation("=== DATOS DE DEPURACIÓN ===");
+                _logger.LogInformation("Contraseña almacenada: '{StoredPassword}' (Longitud: {StoredLength})", usuario.Password, usuario.Password?.Length);
+                _logger.LogInformation("Contraseña ingresada:  '{EnteredPassword}' (Longitud: {EnteredLength})", model.Password, model.Password?.Length);
+                _logger.LogInformation("¿Son iguales?: {AreEqual}", model.Password == usuario.Password);
+                _logger.LogInformation("¿Usuario activo?: {IsActive}", usuario.EstaActivo);
+                
+                // Forzar la contraseña para pruebas
+                bool isPasswordValid = string.Equals(model.Password, usuario.Password, StringComparison.Ordinal);
+                _logger.LogInformation("¿Contraseña válida después de comparación exacta? {IsValid}", isPasswordValid);
                 
                 if (usuario.EstaActivo && isPasswordValid)
                 {

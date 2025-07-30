@@ -54,7 +54,7 @@ namespace TiendaApp.Data.SeedData
                         ProfileImageUrl = "/images/usuarios/M11.png",
                         FechaRegistro = DateTime.UtcNow,
                         UltimoAcceso = DateTime.UtcNow,
-                        Password = ComputeSha256Hash("admin123")
+                        Password = "admin123"
                     },
                     // Cliente 1
                     new Usuario
@@ -73,7 +73,7 @@ namespace TiendaApp.Data.SeedData
                         ProfileImageUrl = "/images/usuarios/H1.jpg",
                         FechaRegistro = DateTime.UtcNow,
                         UltimoAcceso = DateTime.UtcNow,
-                        Password = ComputeSha256Hash("cliente123")
+                        Password = "cliente123"
                     },
                     // Cliente 2
                     new Usuario
@@ -92,7 +92,7 @@ namespace TiendaApp.Data.SeedData
                         ProfileImageUrl = "/images/usuarios/M1.jpg",
                         FechaRegistro = DateTime.UtcNow,
                         UltimoAcceso = DateTime.UtcNow,
-                        Password = ComputeSha256Hash("cliente123")
+                        Password = "cliente123"
                     },
                     // Cliente 3
                     new Usuario
@@ -111,7 +111,7 @@ namespace TiendaApp.Data.SeedData
                         ProfileImageUrl = "/images/usuarios/H2.jpg",
                         FechaRegistro = DateTime.UtcNow,
                         UltimoAcceso = DateTime.UtcNow,
-                        Password = ComputeSha256Hash("cliente123")
+                        Password = "cliente123"
                     },
                     // Cliente 4
                     new Usuario
@@ -130,7 +130,7 @@ namespace TiendaApp.Data.SeedData
                         ProfileImageUrl = "/images/usuarios/M2.jpg",
                         FechaRegistro = DateTime.UtcNow,
                         UltimoAcceso = DateTime.UtcNow,
-                        Password = ComputeSha256Hash("cliente123")
+                        Password = "cliente123"
                     },
                     // Cliente 5
                     new Usuario
@@ -149,7 +149,7 @@ namespace TiendaApp.Data.SeedData
                         ProfileImageUrl = "/images/usuarios/H3.jpg",
                         FechaRegistro = DateTime.UtcNow,
                         UltimoAcceso = DateTime.UtcNow,
-                        Password = ComputeSha256Hash("cliente123")
+                        Password = "cliente123"
                     }
                 };
 
@@ -170,24 +170,6 @@ namespace TiendaApp.Data.SeedData
                     throw;
                 }
             }
-        }
-
-        private static string ComputeSha256Hash(string rawData)  
-        {  
-            // Create a SHA256   
-            using (SHA256 sha256Hash = SHA256.Create())  
-            {  
-                // ComputeHash - returns byte array  
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));  
-
-                // Convert byte array to a string   
-                StringBuilder builder = new StringBuilder();  
-                for (int i = 0; i < bytes.Length; i++)  
-                {  
-                    builder.Append(bytes[i].ToString("x2"));  
-                }  
-                return builder.ToString();  
-            }  
         }
     }
 }
